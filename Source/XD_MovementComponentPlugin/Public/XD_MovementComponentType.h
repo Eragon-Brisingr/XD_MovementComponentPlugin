@@ -40,13 +40,6 @@ enum class EALS_MovementMode : uint8
 };
 
 UENUM(BlueprintType)
-enum class EPlayerViewMode : uint8
-{
-	ThirdPerson,
-	FirstPerson
-};
-
-UENUM(BlueprintType)
 enum class ECardinalDirection : uint8
 {
 	North,
@@ -54,40 +47,3 @@ enum class ECardinalDirection : uint8
 	West,
 	South
 };
-
-UENUM(BlueprintType)
-enum class EIdleEntryState : uint8
-{
-	N_Idle,
-	LF_Idle,
-	C_Idle
-};
-
-UENUM(BlueprintType)
-enum class EMovementDirection : uint8
-{
-	Forwards,
-	Backwards
-};
-
-USTRUCT(BlueprintType)
-struct FALSN_PivotParams
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS_PivotParams")
-	float PivotDirection;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS_PivotParams")
-	EMovementDirection CompletedMovementDirection;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS_PivotParams")
-	float CompletedStartTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS_PivotParams")
-	EMovementDirection InterruptedMovementDirection;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS_PivotParams")
-	float InterruptedStartTime;
-};
-

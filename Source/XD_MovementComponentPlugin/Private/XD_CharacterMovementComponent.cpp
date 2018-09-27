@@ -7,6 +7,7 @@
 
 
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
+	:bCanSprint(true)
 {
 	RotationRate = FRotator::ZeroRotator;
 
@@ -340,25 +341,29 @@ FVector UXD_CharacterMovementComponent::GetVelocity() const
 
 bool UXD_CharacterMovementComponent::CanSprint() const
 {
-	switch (ALS_MovementMode)
+	if (bCanSprint)
 	{
-	case EALS_MovementMode::Grounded:
-	case EALS_MovementMode::Falling:
-		switch (RotationMode)
+		switch (ALS_MovementMode)
 		{
-		case ECharacterRotationMode::VelocityDirection:
-			return true;
-		case ECharacterRotationMode::LookingDirection:
-			if (HasMovementInput())
+		case EALS_MovementMode::Grounded:
+		case EALS_MovementMode::Falling:
+			switch (RotationMode)
 			{
-				if (bAiming)
+			case ECharacterRotationMode::VelocityDirection:
+				return true;
+			case ECharacterRotationMode::LookingDirection:
+				if (HasMovementInput())
 				{
-					return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), LookingRotation).Yaw) < 50.f;
+					if (bAiming)
+					{
+						return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), LookingRotation).Yaw) < 50.f;
+					}
+					return true;
 				}
-			}
-			else
-			{
-				return false;
+				else
+				{
+					return false;
+				}
 			}
 		}
 	}
