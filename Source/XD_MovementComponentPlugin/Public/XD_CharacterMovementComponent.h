@@ -95,7 +95,7 @@ public:
 	EALS_MovementMode ALS_MovementMode = EALS_MovementMode::Grounded;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
-	ECharacterRotationMode RotationMode;
+	ECharacterRotationMode RotationMode = ECharacterRotationMode::LookingDirection;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
 	FRotator LookingRotation;
