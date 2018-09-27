@@ -40,24 +40,50 @@ protected:
 
 	float CalculateRotationRate(float SlowSpeed, float SlowSpeedRate, float FastSpeed, float FastSpeedRate) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	FVector GetVelocity() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	bool CanSprint() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	bool HasMovementInput() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	FRotator GetLastVelocityRotation() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	FRotator GetLastMovementInputRotation() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	bool IsMoving() const;
 public:
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnALS_MovementModeChanged, EALS_MovementMode, PreALS_MovementMode, EALS_MovementMode, ALS_MovementMode);
+	UPROPERTY(BlueprintAssignable)
+	FOnALS_MovementModeChanged OnALS_MovementModeChanged;
 	void SetALS_MovementMode(EALS_MovementMode NewMovementMode);
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInvokeGaitChanged, ECharacterGait, PreGait, ECharacterGait, Gait);
+	UPROPERTY(BlueprintAssignable)
+	FOnInvokeGaitChanged OnInvokeGaitChanged;
 	void SetGait(ECharacterGait Value);
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStanceStateChanged, ECharacterStanceState, PreStanceState, ECharacterStanceState, StanceState);
+	UPROPERTY(BlueprintAssignable)
+	FOnStanceStateChanged OnStanceStateChanged;
+	void SetStanceState(ECharacterStanceState Value);
+
+	virtual void Crouch(bool bClientSimulation) override;
+
+	virtual void UnCrouch(bool bClientSimulation)  override;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRotationModeChanged, ECharacterRotationMode, PreRotationMode, ECharacterRotationMode, RotationMode);
+	UPROPERTY(BlueprintAssignable)
+	FOnRotationModeChanged OnRotationModeChanged;
+	void SetRotationMode(ECharacterRotationMode Value);
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
-	ECharacterGait Gait;
+	ECharacterGait InvokeGait;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterStanceState StanceState;
@@ -66,14 +92,19 @@ public:
 	uint8 bAiming : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
-	EALS_MovementMode ALS_MovementMode;
+	EALS_MovementMode ALS_MovementMode = EALS_MovementMode::Grounded;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterRotationMode RotationMode;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
 	FRotator LookingRotation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
 	float AimYawDelta;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
+	float AimYawRate;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	uint8 bShouldSprint : 1;
@@ -90,12 +121,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	void SetCharacterRotation(const FRotator& Rotation);
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	float GetMovementInputVelocityDifference() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	float GetTargetCharacterRotationDifference() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	float GetDirection() const;
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
 	ECardinalDirection CardinalDirection;

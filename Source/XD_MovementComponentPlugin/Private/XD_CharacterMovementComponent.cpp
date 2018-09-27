@@ -9,6 +9,10 @@
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
 {
 	RotationRate = FRotator::ZeroRotator;
+
+	MovementState.bCanCrouch = true;
+	MovementState.bCanSwim = true;
+	MovementState.bCanFly = true;
 }
 
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -20,7 +24,9 @@ void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelT
 
 void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 {
+	float PreAimYaw = LookingRotation.Yaw;
 	LookingRotation = CharacterOwner->GetControlRotation();
+	AimYawRate = (LookingRotation.Yaw - PreAimYaw) / DeltaTime;
 	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(LookingRotation, GetCharacterRotation()).Yaw;
 
 	switch (ALS_MovementMode)
@@ -28,7 +34,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 	case EALS_MovementMode::Grounded:
 		if (StanceState == ECharacterStanceState::Standing)
 		{
-			switch (Gait)
+			switch (InvokeGait)
 			{
 			case ECharacterGait::Running:
 			case ECharacterGait::Sprinting:
@@ -168,7 +174,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 	//TODO 存在争议
 	if (bAiming)
 	{
-		switch (Gait)
+		switch (InvokeGait)
 		{
 		case ECharacterGait::Walking:
 		case ECharacterGait::Running:
@@ -179,7 +185,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 	}
 	else
 	{
-		switch (Gait)
+		switch (InvokeGait)
 		{
 		case ECharacterGait::Walking:
 			return WalkingSpeed;
@@ -194,7 +200,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 
 float UXD_CharacterMovementComponent::ChooseMaxWalkCrouchedSpeed() const
 {
-	switch (Gait)
+	switch (InvokeGait)
 	{
 	case ECharacterGait::Walking:
 	case ECharacterGait::Running:
@@ -207,7 +213,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkCrouchedSpeed() const
 
 float UXD_CharacterMovementComponent::ChooseMaxAcceleration() const
 {
-	switch (Gait)
+	switch (InvokeGait)
 	{
 	case ECharacterGait::Walking:
 		return WalkingAcceleration;
@@ -220,7 +226,7 @@ float UXD_CharacterMovementComponent::ChooseMaxAcceleration() const
 
 float UXD_CharacterMovementComponent::ChooseBrakingDeceleration() const
 {
-	switch (Gait)
+	switch (InvokeGait)
 	{
 	case ECharacterGait::Walking:
 		return WalkingDeceleration;
@@ -233,7 +239,7 @@ float UXD_CharacterMovementComponent::ChooseBrakingDeceleration() const
 
 float UXD_CharacterMovementComponent::ChooseGroundFriction() const
 {
-	switch (Gait)
+	switch (InvokeGait)
 	{
 	case ECharacterGait::Walking:
 		return WalkingGroundFriction;
@@ -385,10 +391,12 @@ void UXD_CharacterMovementComponent::SetALS_MovementMode(EALS_MovementMode NewMo
 {
 	if (NewMovementMode != ALS_MovementMode)
 	{
-		EALS_MovementMode ALS_PrevMovementMode = ALS_MovementMode;
+		EALS_MovementMode PreALS_MovementMode = ALS_MovementMode;
 		ALS_MovementMode = NewMovementMode;
 
 		UpdateMovementSetting();
+
+		OnALS_MovementModeChanged.Broadcast(PreALS_MovementMode, ALS_MovementMode);
 
 // 		if (Character->IsLocallyControlled())
 // 		{
@@ -414,11 +422,52 @@ void UXD_CharacterMovementComponent::SetALS_MovementMode(EALS_MovementMode NewMo
 
 void UXD_CharacterMovementComponent::SetGait(ECharacterGait Value)
 {
-	if (Value != Gait)
+	if (Value != InvokeGait)
 	{
-		Gait = Value;
-
+		ECharacterGait PreInvokeGait = InvokeGait;
+		InvokeGait = Value;
 		UpdateMovementSetting();
+		OnInvokeGaitChanged.Broadcast(PreInvokeGait, InvokeGait);
+	}
+}
+
+void UXD_CharacterMovementComponent::SetStanceState(ECharacterStanceState Value)
+{
+	if (Value != StanceState)
+	{
+		ECharacterStanceState PreStanceState = StanceState;
+		StanceState = Value;
+		UpdateMovementSetting();
+
+		OnStanceStateChanged.Broadcast(PreStanceState, StanceState);
+	}
+}
+
+void UXD_CharacterMovementComponent::Crouch(bool bClientSimulation)
+{
+	Super::Crouch(bClientSimulation);
+	SetStanceState(ECharacterStanceState::Crouching);
+}
+
+void UXD_CharacterMovementComponent::UnCrouch(bool bClientSimulation)
+{
+	Super::UnCrouch(bClientSimulation);
+	SetStanceState(ECharacterStanceState::Standing);
+}
+
+void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Value)
+{
+	if (Value != RotationMode)
+	{
+		ECharacterRotationMode PreRotationMode = RotationMode;
+		RotationMode = Value;
+
+		if (IsMoving())
+		{
+			RotationRateMultiplier = 0.f;
+		}
+
+		OnRotationModeChanged.Broadcast(PreRotationMode, RotationMode);
 	}
 }
 
