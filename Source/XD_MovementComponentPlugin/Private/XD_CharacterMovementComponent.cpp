@@ -26,7 +26,7 @@ void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelT
 void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 {
 	float PreAimYaw = LookingRotation.Yaw;
-	LookingRotation = CharacterOwner->GetControlRotation();
+	LookingRotation = GetCharacterOwing()->GetControlRotation();
 	AimYawRate = (LookingRotation.Yaw - PreAimYaw) / DeltaTime;
 	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(LookingRotation, GetCharacterRotation()).Yaw;
 
@@ -51,7 +51,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 		break;
 	}
 
-	if (CharacterOwner->IsLocallyControlled())
+	if (GetCharacterOwing()->HasAuthority() || GetCharacterOwing()->IsLocallyControlled())
 	{
 		if (bShouldSprint)
 		{
@@ -94,7 +94,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 				}
 				}
 			}
-			else if (!CharacterOwner->IsPlayingRootMotion() && RotationMode == ECharacterRotationMode::LookingDirection)
+			else if (!GetCharacterOwing()->IsPlayingRootMotion() && RotationMode == ECharacterRotationMode::LookingDirection)
 			{
 				auto LimitRotation = [&, this](float AimYawLimit, float InterpSpeed)
 				{
@@ -124,15 +124,15 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 
 			break;
 		}
-	}
 
 
-	if (RotationRateMultiplier < 1.f)
-	{
-		RotationRateMultiplier += DeltaTime;
-		if (RotationRateMultiplier > 1.f)
+		if (RotationRateMultiplier < 1.f)
 		{
-			RotationRateMultiplier = 1.f;
+			RotationRateMultiplier += DeltaTime;
+			if (RotationRateMultiplier > 1.f)
+			{
+				RotationRateMultiplier = 1.f;
+			}
 		}
 	}
 }
@@ -332,9 +332,9 @@ FVector UXD_CharacterMovementComponent::GetVelocity() const
 	case EALS_MovementMode::None:
 	case EALS_MovementMode::Grounded:
 	case EALS_MovementMode::Falling:
-		return CharacterOwner->GetVelocity();
+		return GetCharacterOwing()->GetVelocity();
 	case EALS_MovementMode::Ragdoll:
-		return CharacterOwner->GetMesh()->GetComponentVelocity();
+		return GetCharacterOwing()->GetMesh()->GetComponentVelocity();
 	}
 	return FVector::ZeroVector;
 }
@@ -481,17 +481,17 @@ void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Valu
 
 FVector UXD_CharacterMovementComponent::GetMovementInput() const
 {
-	return UXD_MovementComponentFunctionLibrary::GetMovementInput(CharacterOwner);
+	return UXD_MovementComponentFunctionLibrary::GetMovementInput(GetCharacterOwing());
 }
 
 FRotator UXD_CharacterMovementComponent::GetCharacterRotation() const
 {
-	return CharacterOwner->GetActorRotation();
+	return GetCharacterOwing()->GetActorRotation();
 }
 
 void UXD_CharacterMovementComponent::SetCharacterRotation(const FRotator& Rotation)
 {
-	CharacterOwner->SetActorRotation(Rotation);
+	GetCharacterOwing()->SetActorRotation(Rotation);
 }
 
 float UXD_CharacterMovementComponent::GetMovementInputVelocityDifference() const
@@ -507,4 +507,9 @@ float UXD_CharacterMovementComponent::GetTargetCharacterRotationDifference() con
 float UXD_CharacterMovementComponent::GetDirection() const
 {
 	return UKismetMathLibrary::NormalizedDeltaRotator(GetLastVelocityRotation(), GetCharacterRotation()).Yaw;
+}
+
+class ACharacter* UXD_CharacterMovementComponent::GetCharacterOwing() const
+{
+	return CharacterOwner ? CharacterOwner : CastChecked<ACharacter>(GetOwner());
 }

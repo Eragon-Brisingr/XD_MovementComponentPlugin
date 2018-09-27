@@ -129,6 +129,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	float GetDirection() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	class ACharacter* GetCharacterOwing() const;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
 	ECardinalDirection CardinalDirection;
