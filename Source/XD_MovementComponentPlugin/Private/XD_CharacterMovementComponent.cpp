@@ -366,12 +366,26 @@ bool UXD_CharacterMovementComponent::HasMovementInput() const
 
 FRotator UXD_CharacterMovementComponent::GetLastVelocityRotation() const
 {
-	return GetVelocity().Rotation();
+	if (GetVelocity().Size() > 0.f)
+	{
+		return GetVelocity().Rotation();
+	}
+	else
+	{
+		return GetCharacterRotation();
+	}
 }
 
 FRotator UXD_CharacterMovementComponent::GetLastMovementInputRotation() const
 {
-	return GetMovementInput().Rotation();
+	if (GetMovementInput().Size() > 0.f)
+	{
+		return GetMovementInput().Rotation();
+	}
+	else
+	{
+		return GetCharacterRotation();
+	}
 }
 
 bool UXD_CharacterMovementComponent::IsMoving() const
