@@ -352,18 +352,7 @@ bool UXD_CharacterMovementComponent::CanSprint() const
 			case ECharacterRotationMode::VelocityDirection:
 				return true;
 			case ECharacterRotationMode::LookingDirection:
-				if (HasMovementInput())
-				{
-					if (bAiming)
-					{
-						return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), LookingRotation).Yaw) < 50.f;
-					}
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), LookingRotation).Yaw) < 50.f;
 			}
 		}
 	}
