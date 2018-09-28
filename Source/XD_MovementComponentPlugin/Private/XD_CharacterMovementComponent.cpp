@@ -10,13 +10,15 @@
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
 	:bCanSprint(true)
 {
-	RotationRate = FRotator::ZeroRotator;
+	SetIsReplicated(true);
 
 	MovementState.bCanCrouch = true;
 	MovementState.bCanSwim = true;
 	MovementState.bCanFly = true;
 
-	SetIsReplicated(true);
+	RotationRate = FRotator::ZeroRotator;
+	bCanWalkOffLedgesWhenCrouching = true;
+	CrouchedHalfHeight = 60.f;
 }
 
 void UXD_CharacterMovementComponent::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
@@ -524,13 +526,19 @@ class ACharacter* UXD_CharacterMovementComponent::GetCharacterOwing() const
 	return CharacterOwner ? CharacterOwner : CastChecked<ACharacter>(GetOwner());
 }
 
+float UXD_CharacterMovementComponent::GetMovingOnSlopeSpeedMultiplier() const
+{
+	return 1.f + FVector::DotProduct(CurrentFloor.HitResult.Normal, GetVelocity().GetSafeNormal());
+}
+
 float UXD_CharacterMovementComponent::GetMaxSpeed() const
 {
 	switch (MovementMode)
 	{
 	case MOVE_Walking:
 	case MOVE_NavWalking:
-		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier;
+		
+		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * GetMovingOnSlopeSpeedMultiplier();
 	default:
 		return Super::GetMaxSpeed();
 	}

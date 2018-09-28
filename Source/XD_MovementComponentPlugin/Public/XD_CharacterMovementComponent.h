@@ -155,6 +155,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Advance Movement")
 	float GroundMoveSpeedMultiplier = 1.f;
 
+	UFUNCTION(BlueprintCallable, Category = "Advance Movement")
+	float GetMovingOnSlopeSpeedMultiplier() const;
+
 	virtual float GetMaxSpeed() const override;
 	//Config
 public:
