@@ -4,6 +4,7 @@
 #include "XD_MovementComponentFunctionLibrary.h"
 #include <GameFramework/Character.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <UnrealNetwork.h>
 
 
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
@@ -14,6 +15,16 @@ UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
 	MovementState.bCanCrouch = true;
 	MovementState.bCanSwim = true;
 	MovementState.bCanFly = true;
+
+	SetIsReplicated(true);
+}
+
+void UXD_CharacterMovementComponent::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, LookingRotation, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, MovementInputVelocityDifference, COND_SkipOwner);
 }
 
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -25,9 +36,12 @@ void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelT
 
 void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 {
-	float PreAimYaw = LookingRotation.Yaw;
-	LookingRotation = GetCharacterOwing()->GetControlRotation();
-	AimYawRate = (LookingRotation.Yaw - PreAimYaw) / DeltaTime;
+	if (GetOwner()->HasAuthority() || GetCharacterOwner()->IsLocallyControlled())
+	{
+		LookingRotation = GetCharacterOwing()->GetControlRotation();
+
+		MovementInputVelocityDifference = UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), GetLastVelocityRotation()).Yaw;
+	}
 	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(LookingRotation, GetCharacterRotation()).Yaw;
 
 	switch (ALS_MovementMode)
@@ -39,9 +53,8 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 			{
 			case ECharacterGait::Running:
 			case ECharacterGait::Sprinting:
-				float MovementInputVelocityDifference = FMath::Abs(GetMovementInputVelocityDifference());
-				MaxAcceleration = RunningAcceleration * UKismetMathLibrary::MapRangeClamped(MovementInputVelocityDifference, 45.f, 130.f, 1.f, 0.2f);
-				GroundFriction = RunningGroundFriction * UKismetMathLibrary::MapRangeClamped(MovementInputVelocityDifference, 45.f, 130.f, 1.f, 0.4f);
+				MaxAcceleration = RunningAcceleration * UKismetMathLibrary::MapRangeClamped(FMath::Abs(MovementInputVelocityDifference), 45.f, 130.f, 1.f, 0.2f);
+				GroundFriction = RunningGroundFriction * UKismetMathLibrary::MapRangeClamped(FMath::Abs(MovementInputVelocityDifference), 45.f, 130.f, 1.f, 0.4f);
 				break;
 			}
 		}
@@ -492,11 +505,6 @@ FRotator UXD_CharacterMovementComponent::GetCharacterRotation() const
 void UXD_CharacterMovementComponent::SetCharacterRotation(const FRotator& Rotation)
 {
 	GetCharacterOwing()->SetActorRotation(Rotation);
-}
-
-float UXD_CharacterMovementComponent::GetMovementInputVelocityDifference() const
-{
-	return UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), GetLastVelocityRotation()).Yaw;
 }
 
 float UXD_CharacterMovementComponent::GetTargetCharacterRotationDifference() const

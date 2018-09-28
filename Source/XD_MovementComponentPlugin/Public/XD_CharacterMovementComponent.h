@@ -18,6 +18,8 @@ class XD_MOVEMENTCOMPONENTPLUGIN_API UXD_CharacterMovementComponent : public UCh
 public:
 	UXD_CharacterMovementComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
+
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 	void CustomMovingTick(float DeltaTime);
@@ -97,14 +99,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterRotationMode RotationMode = ECharacterRotationMode::LookingDirection;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables", Replicated)
 	FRotator LookingRotation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
 	float AimYawDelta;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
-	float AimYawRate;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	uint8 bShouldSprint : 1;
@@ -121,8 +119,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	void SetCharacterRotation(const FRotator& Rotation);
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
-	float GetMovementInputVelocityDifference() const;
+	UPROPERTY(BlueprintReadOnly, Category = "Advance Move", Replicated)
+	float MovementInputVelocityDifference;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	float GetTargetCharacterRotationDifference() const;
