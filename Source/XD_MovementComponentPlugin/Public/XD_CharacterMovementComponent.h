@@ -110,7 +110,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	uint8 bCanSprint : 1;
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "Advance Movement", Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = "Input", Replicated)
 	FVector MovementInput;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
@@ -133,6 +133,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	class ACharacter* GetCharacterOwing() const;
+
+	//CharacterRotation
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
 	ECardinalDirection CardinalDirection;
@@ -143,9 +145,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
 	float RotationOffset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
-	float RotationRateMultiplier;
+	UPROPERTY(BlueprintReadOnly, Category = "Character Rotation System")
+	float RotationRateMultiplier = 1.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
+	float RootMotionRotationSpeed = 0.f;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Advance Movement")
+	float GroundMoveSpeedMultiplier = 1.f;
+
+	virtual float GetMaxSpeed() const override;
 	//Config
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Walk")

@@ -86,32 +86,34 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 		switch (ALS_MovementMode)
 		{
 		case EALS_MovementMode::Grounded:
-			if (IsMoving())
+			if (!GetCharacterOwing()->IsPlayingRootMotion())
 			{
-				switch (RotationMode)
+				if (IsMoving())
 				{
-				case ECharacterRotationMode::VelocityDirection:
-				{
-					FRotator CharacterRotation = GetCharacterRotation();
-					TargetRotation = FRotator(CharacterRotation.Pitch, GetLastVelocityRotation().Yaw, CharacterRotation.Roll);
-					float InterpSpeed = CalculateRotationRate(165.f, 5.f, 375.f, 10.f);
-					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
-					break;
+					switch (RotationMode)
+					{
+					case ECharacterRotationMode::VelocityDirection:
+					{
+						FRotator CharacterRotation = GetCharacterRotation();
+						TargetRotation = FRotator(CharacterRotation.Pitch, GetLastVelocityRotation().Yaw, CharacterRotation.Roll);
+						float InterpSpeed = CalculateRotationRate(165.f, 5.f, 375.f, 10.f);
+						SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
+						break;
+					}
+					case ECharacterRotationMode::LookingDirection:
+					{
+						FRotator CharacterRotation = GetCharacterRotation();
+						float InterpSpeed = bAiming ? CalculateRotationRate(165.f, 15.f, 375.f, 15.f) : CalculateRotationRate(165.f, 10.f, 375.f, 15.f);
+						TargetRotation = FRotator(CharacterRotation.Pitch, LookingDirectionWithOffsetYaw(DeltaTime, 5.f, 60.f, -60.f, 120.f, -120.f, 5.f), CharacterRotation.Roll);
+						SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
+						break;
+					}
+					}
 				}
-				case ECharacterRotationMode::LookingDirection:
+				else if (bAiming && RotationMode == ECharacterRotationMode::LookingDirection)
 				{
-					FRotator CharacterRotation = GetCharacterRotation();
-					float InterpSpeed = bAiming ? CalculateRotationRate(165.f, 15.f, 375.f, 15.f) : CalculateRotationRate(165.f, 10.f, 375.f, 15.f);
-					TargetRotation = FRotator(CharacterRotation.Pitch, LookingDirectionWithOffsetYaw(DeltaTime, 5.f, 60.f, -60.f, 120.f, -120.f, 5.f), CharacterRotation.Roll);
-					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
-					break;
-				}
-				}
-			}
-			else if (!GetCharacterOwing()->IsPlayingRootMotion() && RotationMode == ECharacterRotationMode::LookingDirection)
-			{
-				auto LimitRotation = [&, this](float AimYawLimit, float InterpSpeed)
-				{
+					float AimYawLimit = 90.f;
+					float InterpSpeed = 15.f;
 					if (FMath::Abs(AimYawDelta) > AimYawLimit)
 					{
 						FRotator CharacterRotation = GetCharacterRotation();
@@ -119,18 +121,17 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 						TargetRotation = FRotator(CharacterRotation.Pitch, Yaw, CharacterRotation.Roll);
 						SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
 					}
-				};
-				if (bAiming)
-				{
-					LimitRotation(90.f, 15.f);
 				}
-				// 				else
-				// 				{
-				// 					if (PlayerViewMode == EPlayerViewMode::FirstPerson)
-				// 					{
-				// 						LimitRotation(90.f, 15.f);
-				// 					}
-				// 				}
+			}
+			else
+			{
+				RotationRateMultiplier = 0.f;
+				if (RootMotionRotationSpeed > 0.f && HasMovementInput())
+				{
+					FRotator CharacterRotation = GetCharacterRotation();
+					TargetRotation = FRotator(CharacterRotation.Pitch, MovementInput.Rotation().Yaw, CharacterRotation.Roll);
+					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, RootMotionRotationSpeed));
+				}
 			}
 			break;
 
@@ -521,4 +522,16 @@ float UXD_CharacterMovementComponent::GetDirection() const
 class ACharacter* UXD_CharacterMovementComponent::GetCharacterOwing() const
 {
 	return CharacterOwner ? CharacterOwner : CastChecked<ACharacter>(GetOwner());
+}
+
+float UXD_CharacterMovementComponent::GetMaxSpeed() const
+{
+	switch (MovementMode)
+	{
+	case MOVE_Walking:
+	case MOVE_NavWalking:
+		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier;
+	default:
+		return Super::GetMaxSpeed();
+	}
 }
