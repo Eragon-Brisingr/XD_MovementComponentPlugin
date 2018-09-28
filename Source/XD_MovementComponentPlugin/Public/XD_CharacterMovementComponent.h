@@ -110,6 +110,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	uint8 bCanSprint : 1;
 public:
+	UPROPERTY(BlueprintReadOnly, Category = "Advance Movement", Replicated)
+	FVector MovementInput;
+
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	FVector GetMovementInput() const;
 
@@ -119,7 +122,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")
 	void SetCharacterRotation(const FRotator& Rotation);
 
-	UPROPERTY(BlueprintReadOnly, Category = "Advance Move", Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = "Advance Move")
 	float MovementInputVelocityDifference;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Movement")

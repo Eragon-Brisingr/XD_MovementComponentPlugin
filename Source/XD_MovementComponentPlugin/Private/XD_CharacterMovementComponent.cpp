@@ -24,7 +24,7 @@ void UXD_CharacterMovementComponent::GetLifetimeReplicatedProps(TArray< class FL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, LookingRotation, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, MovementInputVelocityDifference, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, MovementInput, COND_SkipOwner);
 }
 
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -40,9 +40,10 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 	{
 		LookingRotation = GetCharacterOwing()->GetControlRotation();
 
-		MovementInputVelocityDifference = UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), GetLastVelocityRotation()).Yaw;
+		MovementInput = UXD_MovementComponentFunctionLibrary::GetMovementInput(GetCharacterOwing());
 	}
 	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(LookingRotation, GetCharacterRotation()).Yaw;
+	MovementInputVelocityDifference = UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), GetLastVelocityRotation()).Yaw;
 
 	switch (ALS_MovementMode)
 	{
@@ -494,7 +495,7 @@ void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Valu
 
 FVector UXD_CharacterMovementComponent::GetMovementInput() const
 {
-	return UXD_MovementComponentFunctionLibrary::GetMovementInput(GetCharacterOwing());
+	return MovementInput;
 }
 
 FRotator UXD_CharacterMovementComponent::GetCharacterRotation() const
