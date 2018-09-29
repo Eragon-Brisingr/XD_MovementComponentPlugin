@@ -533,7 +533,14 @@ class ACharacter* UXD_CharacterMovementComponent::GetCharacterOwing() const
 
 float UXD_CharacterMovementComponent::GetMovingOnSlopeSpeedMultiplier() const
 {
-	return 1.f + FVector::DotProduct(CurrentFloor.HitResult.Normal, GetVelocity().GetSafeNormal());
+	if (IsMoving())
+	{
+		return 1.f + FVector::DotProduct(CurrentFloor.HitResult.Normal, GetVelocity().GetUnsafeNormal()) / 2.f;
+	}
+	else
+	{
+		return 1.f;
+	}
 }
 
 float UXD_CharacterMovementComponent::GetMaxSpeed() const
@@ -542,9 +549,18 @@ float UXD_CharacterMovementComponent::GetMaxSpeed() const
 	{
 	case MOVE_Walking:
 	case MOVE_NavWalking:
-		
-		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * AnimNotifyControlGroundMoveSpeedMultiplier *  GetMovingOnSlopeSpeedMultiplier();
-	default:
-		return Super::GetMaxSpeed();
+		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * AnimNotifyControlGroundMoveSpeedMultiplier * GetMovingOnSlopeSpeedMultiplier();
 	}
+	return Super::GetMaxSpeed();
+}
+
+FVector UXD_CharacterMovementComponent::CalcAnimRootMotionVelocity(const FVector& RootMotionDeltaMove, float DeltaSeconds, const FVector& CurrentVelocity) const
+{
+	switch (MovementMode)
+	{
+	case MOVE_Walking:
+	case MOVE_NavWalking:
+		return Super::CalcAnimRootMotionVelocity(RootMotionDeltaMove, DeltaSeconds, CurrentVelocity) * GetMovingOnSlopeSpeedMultiplier();
+	}
+	return Super::CalcAnimRootMotionVelocity(RootMotionDeltaMove, DeltaSeconds, CurrentVelocity);
 }

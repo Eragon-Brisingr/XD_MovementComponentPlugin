@@ -162,6 +162,8 @@ public:
 	float GetMovingOnSlopeSpeedMultiplier() const;
 
 	virtual float GetMaxSpeed() const override;
+
+	virtual FVector CalcAnimRootMotionVelocity(const FVector& RootMotionDeltaMove, float DeltaSeconds, const FVector& CurrentVelocity) const override;
 	//Config
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Walk")
