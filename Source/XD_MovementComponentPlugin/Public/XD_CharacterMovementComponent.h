@@ -84,31 +84,34 @@ public:
 	FOnRotationModeChanged OnRotationModeChanged;
 	void SetRotationMode(ECharacterRotationMode Value);
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterGait InvokeGait;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterStanceState StanceState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
 	uint8 bAiming : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
 	EALS_MovementMode ALS_MovementMode = EALS_MovementMode::Grounded;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterRotationMode RotationMode = ECharacterRotationMode::LookingDirection;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables", Replicated)
+	UPROPERTY(BlueprintReadWrite, Category = "Essential Variables", Replicated)
 	FRotator LookingRotation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essential Variables")
+	UPROPERTY(BlueprintReadWrite, Category = "Essential Variables")
 	float AimYawDelta;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	uint8 bShouldSprint : 1;
+	uint8 bInvokeSprint : 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control")
 	uint8 bCanSprint : 1;
+
+	UFUNCTION(BlueprintPure, Category = "State")
+	bool IsSprinting() const;
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Input", Replicated)
 	FVector MovementInput;

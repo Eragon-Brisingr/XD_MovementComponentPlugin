@@ -69,7 +69,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 
 	if (GetCharacterOwing()->HasAuthority() || GetCharacterOwing()->IsLocallyControlled())
 	{
-		if (bShouldSprint)
+		if (bInvokeSprint)
 		{
 			if (CanSprint())
 			{
@@ -494,6 +494,11 @@ void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Valu
 
 		OnRotationModeChanged.Broadcast(PreRotationMode, RotationMode);
 	}
+}
+
+bool UXD_CharacterMovementComponent::IsSprinting() const
+{
+	return bCanSprint && bInvokeSprint && !GetCharacterOwner()->IsPlayingRootMotion() && (MovementMode == EMovementMode::MOVE_Walking || MovementMode == EMovementMode::MOVE_NavWalking) && GetVelocity().Size() > RunningSpeed && FMath::Abs((GetVelocity().Rotation() - GetCharacterRotation()).GetNormalized().Yaw) < 10.f;
 }
 
 FVector UXD_CharacterMovementComponent::GetMovementInput() const
