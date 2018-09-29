@@ -151,12 +151,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Character Rotation System")
 	float RotationRateMultiplier = 1.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
 	float RootMotionRotationSpeed = 0.f;
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Advance Movement")
 	float GroundMoveSpeedMultiplier = 1.f;
+
+	float AnimNotifyControlGroundMoveSpeedMultiplier = 1.f;
 
 	UFUNCTION(BlueprintCallable, Category = "Advance Movement")
 	float GetMovingOnSlopeSpeedMultiplier() const;

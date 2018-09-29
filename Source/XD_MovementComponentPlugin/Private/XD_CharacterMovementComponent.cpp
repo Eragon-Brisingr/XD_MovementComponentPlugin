@@ -543,7 +543,7 @@ float UXD_CharacterMovementComponent::GetMaxSpeed() const
 	case MOVE_Walking:
 	case MOVE_NavWalking:
 		
-		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * GetMovingOnSlopeSpeedMultiplier();
+		return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * AnimNotifyControlGroundMoveSpeedMultiplier *  GetMovingOnSlopeSpeedMultiplier();
 	default:
 		return Super::GetMaxSpeed();
 	}
