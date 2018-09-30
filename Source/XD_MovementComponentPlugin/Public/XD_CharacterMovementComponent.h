@@ -67,7 +67,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInvokeGaitChanged, ECharacterGait, PreGait, ECharacterGait, Gait);
 	UPROPERTY(BlueprintAssignable)
-	FOnInvokeGaitChanged OnInvokeGaitChanged;
+	FOnInvokeGaitChanged OnGaitChanged;
 	void SetGait(ECharacterGait Value);
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStanceStateChanged, ECharacterStanceState, PreStanceState, ECharacterStanceState, StanceState);
@@ -85,7 +85,7 @@ public:
 	void SetRotationMode(ECharacterRotationMode Value);
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
-	ECharacterGait InvokeGait;
+	ECharacterGait CurrentGait;
 
 	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
 	ECharacterStanceState StanceState;

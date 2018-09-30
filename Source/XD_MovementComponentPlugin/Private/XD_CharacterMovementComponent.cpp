@@ -52,7 +52,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 	case EALS_MovementMode::Grounded:
 		if (StanceState == ECharacterStanceState::Standing)
 		{
-			switch (InvokeGait)
+			switch (CurrentGait)
 			{
 			case ECharacterGait::Running:
 			case ECharacterGait::Sprinting:
@@ -192,7 +192,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 	//TODO 存在争议
 	if (bAiming)
 	{
-		switch (InvokeGait)
+		switch (CurrentGait)
 		{
 		case ECharacterGait::Walking:
 		case ECharacterGait::Running:
@@ -203,7 +203,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 	}
 	else
 	{
-		switch (InvokeGait)
+		switch (CurrentGait)
 		{
 		case ECharacterGait::Walking:
 			return WalkingSpeed;
@@ -218,7 +218,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 
 float UXD_CharacterMovementComponent::ChooseMaxWalkCrouchedSpeed() const
 {
-	switch (InvokeGait)
+	switch (CurrentGait)
 	{
 	case ECharacterGait::Walking:
 	case ECharacterGait::Running:
@@ -231,7 +231,7 @@ float UXD_CharacterMovementComponent::ChooseMaxWalkCrouchedSpeed() const
 
 float UXD_CharacterMovementComponent::ChooseMaxAcceleration() const
 {
-	switch (InvokeGait)
+	switch (CurrentGait)
 	{
 	case ECharacterGait::Walking:
 		return WalkingAcceleration;
@@ -244,7 +244,7 @@ float UXD_CharacterMovementComponent::ChooseMaxAcceleration() const
 
 float UXD_CharacterMovementComponent::ChooseBrakingDeceleration() const
 {
-	switch (InvokeGait)
+	switch (CurrentGait)
 	{
 	case ECharacterGait::Walking:
 		return WalkingDeceleration;
@@ -257,7 +257,7 @@ float UXD_CharacterMovementComponent::ChooseBrakingDeceleration() const
 
 float UXD_CharacterMovementComponent::ChooseGroundFriction() const
 {
-	switch (InvokeGait)
+	switch (CurrentGait)
 	{
 	case ECharacterGait::Walking:
 		return WalkingGroundFriction;
@@ -447,12 +447,12 @@ void UXD_CharacterMovementComponent::SetALS_MovementMode(EALS_MovementMode NewMo
 
 void UXD_CharacterMovementComponent::SetGait(ECharacterGait Value)
 {
-	if (Value != InvokeGait)
+	if (Value != CurrentGait)
 	{
-		ECharacterGait PreInvokeGait = InvokeGait;
-		InvokeGait = Value;
+		ECharacterGait PreInvokeGait = CurrentGait;
+		CurrentGait = Value;
 		UpdateMovementSetting();
-		OnInvokeGaitChanged.Broadcast(PreInvokeGait, InvokeGait);
+		OnGaitChanged.Broadcast(PreInvokeGait, CurrentGait);
 	}
 }
 
