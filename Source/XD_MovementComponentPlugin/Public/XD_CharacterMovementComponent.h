@@ -139,10 +139,10 @@ public:
 
 	//CharacterRotation
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
+	UPROPERTY(BlueprintReadWrite, Category = "Character Rotation System")
 	ECardinalDirection CardinalDirection;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
+	UPROPERTY(BlueprintReadWrite, Category = "Character Rotation System")
 	FRotator TargetRotation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
@@ -153,7 +153,7 @@ public:
 
 	float RootMotionRotationSpeed = 0.f;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Advance Movement")
+	UPROPERTY(BlueprintReadWrite, Category = "Advance Movement")
 	float GroundMoveSpeedMultiplier = 1.f;
 
 	float AnimNotifyControlGroundMoveSpeedMultiplier = 1.f;
