@@ -189,29 +189,14 @@ void UXD_CharacterMovementComponent::UpdateMovementSetting()
 
 float UXD_CharacterMovementComponent::ChooseMaxWalkSpeed() const
 {
-	//TODO 存在争议
-	if (bAiming)
+	switch (CurrentGait)
 	{
-		switch (CurrentGait)
-		{
-		case ECharacterGait::Walking:
-		case ECharacterGait::Running:
-			return WalkingSpeed;
-		case ECharacterGait::Sprinting:
-			return RunningSpeed;
-		}
-	}
-	else
-	{
-		switch (CurrentGait)
-		{
-		case ECharacterGait::Walking:
-			return WalkingSpeed;
-		case ECharacterGait::Running:
-			return RunningSpeed;
-		case ECharacterGait::Sprinting:
-			return SprintingSpeed;
-		}
+	case ECharacterGait::Walking:
+		return WalkingSpeed;
+	case ECharacterGait::Running:
+		return RunningSpeed;
+	case ECharacterGait::Sprinting:
+		return SprintingSpeed;
 	}
 	return 0.f;
 }
