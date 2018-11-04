@@ -40,7 +40,7 @@ FString USetRootMotionRotationSpeed::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("根骨骼位移时旋转速度[%s]"), *FString::SanitizeFloat(RootMotionRotationSpeed));
 }
 
-void UMultiGroundMoveSpeed::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void USetGroundMoveSpeedMultiplier::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
 	if (ACharacter* Character = Cast<ACharacter>(MeshComp->GetOwner()))
 	{
@@ -51,7 +51,7 @@ void UMultiGroundMoveSpeed::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnim
 	}
 }
 
-void UMultiGroundMoveSpeed::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void USetGroundMoveSpeedMultiplier::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
 	if (ACharacter* Character = Cast<ACharacter>(MeshComp->GetOwner()))
 	{
@@ -62,7 +62,7 @@ void UMultiGroundMoveSpeed::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSe
 	}
 }
 
-FString UMultiGroundMoveSpeed::GetNotifyName_Implementation() const
+FString USetGroundMoveSpeedMultiplier::GetNotifyName_Implementation() const
 {
 	return FString::Printf(TEXT("地面移动速度乘子[%s]"), *FString::SanitizeFloat(GroundMoveSpeedMultiplier));
 }
