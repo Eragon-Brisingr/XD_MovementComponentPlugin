@@ -29,6 +29,13 @@ void UXD_CharacterMovementComponent::GetLifetimeReplicatedProps(TArray< class FL
 	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, MovementInput, COND_SkipOwner);
 }
 
+void UXD_CharacterMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetGait(ECharacterGait::Walking);
+}
+
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	CustomMovingTick(DeltaTime);
@@ -79,10 +86,6 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 			{
 				SetGait(ECharacterGait::Running);
 			}
-		}
-		else
-		{
-			SetGait(ECharacterGait::Running);
 		}
 
 		switch (ALS_MovementMode)

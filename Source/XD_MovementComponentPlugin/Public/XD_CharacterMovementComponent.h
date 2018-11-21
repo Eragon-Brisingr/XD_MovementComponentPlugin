@@ -20,6 +20,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
+	virtual void BeginPlay() override;
+
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 	void CustomMovingTick(float DeltaTime);
@@ -84,19 +86,19 @@ public:
 	FOnRotationModeChanged OnRotationModeChanged;
 	void SetRotationMode(ECharacterRotationMode Value);
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadOnly, Category = "ALS State Values")
 	ECharacterGait CurrentGait;
 
-	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadOnly, Category = "ALS State Values")
 	ECharacterStanceState StanceState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
 	uint8 bAiming : 1;
 
-	UPROPERTY(BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadOnly, Category = "ALS State Values")
 	EALS_MovementMode ALS_MovementMode = EALS_MovementMode::Grounded;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ALS State Values")
 	ECharacterRotationMode RotationMode = ECharacterRotationMode::LookingDirection;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Essential Variables", Replicated)

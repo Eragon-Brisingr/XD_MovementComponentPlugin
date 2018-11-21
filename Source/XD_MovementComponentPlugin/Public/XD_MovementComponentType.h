@@ -11,6 +11,7 @@
 UENUM(BlueprintType)
 enum class ECharacterGait : uint8
 {
+	None UMETA(Hidden),
 	Walking,
 	Running,
 	Sprinting
