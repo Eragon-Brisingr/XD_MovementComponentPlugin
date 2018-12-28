@@ -52,7 +52,15 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 		MovementInput = UXD_MovementComponentFunctionLibrary::GetMovementInput(GetCharacterOwing());
 	}
 	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(LookingRotation, GetCharacterRotation()).Yaw;
-	MovementInputVelocityDifference = UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), GetLastVelocityRotation()).Yaw;
+
+	if (HasMovementInput())
+	{
+		MovementInputVelocityDifference = UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), GetLastVelocityRotation()).Yaw;
+	}
+	else
+	{
+		MovementInputVelocityDifference = 0.f;
+	}
 
 	switch (ALS_MovementMode)
 	{
