@@ -44,22 +44,22 @@ protected:
 
 	float CalculateRotationRate(float SlowSpeed, float SlowSpeedRate, float FastSpeed, float FastSpeedRate) const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	FVector GetVelocity() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	bool CanSprint() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	bool HasMovementInput() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	FRotator GetLastVelocityRotation() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	FRotator GetLastMovementInputRotation() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	bool IsMoving() const;
 public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnALS_MovementModeChanged, EALS_MovementMode, PreALS_MovementMode, EALS_MovementMode, ALS_MovementMode);
@@ -86,81 +86,84 @@ public:
 	FOnRotationModeChanged OnRotationModeChanged;
 	void SetRotationMode(ECharacterRotationMode Value);
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|状态")
 	ECharacterGait CurrentGait;
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|状态")
 	ECharacterStanceState StanceState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS State Values")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|状态")
 	uint8 bAiming : 1;
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS State Values")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|状态")
 	EALS_MovementMode ALS_MovementMode = EALS_MovementMode::Grounded;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ALS State Values")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|移动|状态")
 	ECharacterRotationMode RotationMode = ECharacterRotationMode::LookingDirection;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Essential Variables", Replicated)
+	UPROPERTY(EditAnywhere, Category = "角色|移动|状态")
+	uint8 bAutoUpdateLookingRotation : 1;
+
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动", Replicated)
 	FRotator LookingRotation;
-	UPROPERTY(BlueprintReadWrite, Category = "Essential Variables")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动")
 	float AimYawDelta;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|状态")
 	uint8 bInvokeSprint : 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|状态")
 	uint8 bCanSprint : 1;
 
-	UFUNCTION(BlueprintPure, Category = "State")
+	UFUNCTION(BlueprintPure, Category = "角色|移动|状态")
 	bool IsSprinting() const;
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "Input", Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|状态", Replicated)
 	FVector MovementInput;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	FVector GetMovementInput() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	FRotator GetCharacterRotation() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	void SetCharacterRotation(const FRotator& Rotation);
 
-	UPROPERTY(BlueprintReadOnly, Category = "Advance Move")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动")
 	float MovementInputVelocityDifference;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	float GetTargetCharacterRotationDifference() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	float GetDirection() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Character Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
 	class ACharacter* GetCharacterOwing() const;
 
 	//CharacterRotation
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Character Rotation System")
+	UPROPERTY(BlueprintReadWrite, Category = "角色|移动|转身")
 	ECardinalDirection CardinalDirection;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Character Rotation System")
+	UPROPERTY(BlueprintReadWrite, Category = "角色|移动|转身")
 	FRotator TargetRotation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Rotation System")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|转身")
 	float RotationOffset;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Character Rotation System")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|转身")
 	float RotationRateMultiplier = 1.f;
 
 	float RootMotionRotationSpeed = 0.f;
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Advance Movement")
+	UPROPERTY(BlueprintReadWrite, Category = "角色|移动|高级")
 	float GroundMoveSpeedMultiplier = 1.f;
 
 	float AnimNotifyControlGroundMoveSpeedMultiplier = 1.f;
 
-	UFUNCTION(BlueprintCallable, Category = "Advance Movement")
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|高级")
 	float GetMovingOnSlopeSpeedMultiplier() const;
 
 	virtual float GetMaxSpeed() const override;
@@ -168,36 +171,36 @@ public:
 	virtual FVector CalcAnimRootMotionVelocity(const FVector& RootMotionDeltaMove, float DeltaSeconds, const FVector& CurrentVelocity) const override;
 	//Config
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Walk")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|行走")
 	float WalkingSpeed = 165.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Run")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|奔跑")
 	float RunningSpeed = 375.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Sprint")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|冲刺")
 	float SprintingSpeed = 600.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Crouch")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|蹲下")
 	float CrouchingSpeed = 150.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Crouch")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|蹲下")
 	float CrouchingSprintingSpeed = 200.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Walk")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|行走")
 	float WalkingAcceleration = 800.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Run")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|奔跑")
 	float RunningAcceleration = 1000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Walk")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|行走")
 	float WalkingDeceleration = 800.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Run")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|奔跑")
 	float RunningDeceleration = 800.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Walk")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|行走")
 	float WalkingGroundFriction = 8.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement: Run")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|奔跑")
 	float RunningGroundFriction = 6.f;
 };
