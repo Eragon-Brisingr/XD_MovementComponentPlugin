@@ -8,8 +8,8 @@
 
 
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
-	:bCanSprint(true),
-	bAutoUpdateLookingRotation(true)
+	:bAutoUpdateLookingRotation(true),
+	bCanSprint(true)
 {
 	SetIsReplicated(true);
 
