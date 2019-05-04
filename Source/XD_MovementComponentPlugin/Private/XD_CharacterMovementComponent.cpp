@@ -329,9 +329,7 @@ float UXD_CharacterMovementComponent::LookingDirectionWithOffsetYaw(float DeltaT
 
 float UXD_CharacterMovementComponent::CalculateRotationRate(float SlowSpeed, float SlowSpeedRate, float FastSpeed, float FastSpeedRate) const
 {
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0;
-	float HorizontalSpeed = Velocity.Size();
+	float HorizontalSpeed = GetVelocity().Size2D();
 	if (HorizontalSpeed > SlowSpeed)
 	{
 		return FMath::Clamp(UKismetMathLibrary::MapRangeUnclamped(HorizontalSpeed, SlowSpeed, FastSpeed, SlowSpeedRate, FastSpeedRate) * RotationRateMultiplier, 0.1f, 15.f);
@@ -407,9 +405,7 @@ FRotator UXD_CharacterMovementComponent::GetLastMovementInputRotation() const
 
 bool UXD_CharacterMovementComponent::IsMoving() const
 {
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0.f;
-	return !Velocity.Equals(FVector::ZeroVector, 1.f);
+	return !FMath::IsNearlyZero(GetVelocity().Size2D(), 1.f);
 }
 
 void UXD_CharacterMovementComponent::SetALS_MovementMode(EALS_MovementMode NewMovementMode)

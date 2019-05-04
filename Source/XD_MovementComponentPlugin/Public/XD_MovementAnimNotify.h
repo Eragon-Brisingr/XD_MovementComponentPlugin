@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "移动_设置根骨骼位移时旋转速度"))
+UCLASS(meta = (DisplayName = "插件_移动_设置根骨骼位移时旋转速度"))
 class XD_MOVEMENTCOMPONENTPLUGIN_API USetRootMotionRotationSpeed : public UAnimNotifyState
 {
 	GENERATED_BODY()
@@ -27,7 +27,7 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
-UCLASS(meta = (DisplayName = "移动_修正地面移动速度"))
+UCLASS(meta = (DisplayName = "插件_移动_修正地面移动速度"))
 class XD_MOVEMENTCOMPONENTPLUGIN_API USetGroundMoveSpeedMultiplier : public UAnimNotifyState
 {
 	GENERATED_BODY()
