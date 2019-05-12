@@ -99,72 +99,72 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 				SetGait(ECharacterGait::Running);
 			}
 		}
+	}
 
-		switch (ALS_MovementMode)
+	switch (ALS_MovementMode)
+	{
+	case EALS_MovementMode::Grounded:
+		if (!GetCharacterOwing()->IsPlayingRootMotion())
 		{
-		case EALS_MovementMode::Grounded:
-			if (!GetCharacterOwing()->IsPlayingRootMotion())
+			if (IsMoving())
 			{
-				if (IsMoving())
+				switch (RotationMode)
 				{
-					switch (RotationMode)
-					{
-					case ECharacterRotationMode::VelocityDirection:
-					{
-						FRotator CharacterRotation = GetCharacterRotation();
-						TargetRotation = FRotator(CharacterRotation.Pitch, GetLastVelocityRotation().Yaw, CharacterRotation.Roll);
-						float InterpSpeed = CalculateRotationRate(165.f, 5.f, 375.f, 10.f);
-						SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
-						break;
-					}
-					case ECharacterRotationMode::LookingDirection:
-					{
-						FRotator CharacterRotation = GetCharacterRotation();
-						float InterpSpeed = bAiming ? CalculateRotationRate(165.f, 15.f, 375.f, 15.f) : CalculateRotationRate(165.f, 10.f, 375.f, 15.f);
-						TargetRotation = FRotator(CharacterRotation.Pitch, LookingDirectionWithOffsetYaw(DeltaTime, 5.f, 60.f, -60.f, 120.f, -120.f, 5.f), CharacterRotation.Roll);
-						SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
-						break;
-					}
-					}
-				}
-				else if (bAiming && RotationMode == ECharacterRotationMode::LookingDirection)
-				{
-					float AimYawLimit = 90.f;
-					float InterpSpeed = 15.f;
-					if (FMath::Abs(AimYawDelta) > AimYawLimit)
-					{
-						FRotator CharacterRotation = GetCharacterRotation();
-						float Yaw = AimYawDelta > 0.f ? LookingRotation.Yaw - AimYawLimit : LookingRotation.Yaw + AimYawLimit;
-						TargetRotation = FRotator(CharacterRotation.Pitch, Yaw, CharacterRotation.Roll);
-						SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
-					}
-				}
-			}
-			else
-			{
-				RotationRateMultiplier = 0.f;
-				if (RootMotionRotationSpeed > 0.f && HasMovementInput())
+				case ECharacterRotationMode::VelocityDirection:
 				{
 					FRotator CharacterRotation = GetCharacterRotation();
-					TargetRotation = FRotator(CharacterRotation.Pitch, MovementInput.Rotation().Yaw, CharacterRotation.Roll);
-					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, RootMotionRotationSpeed));
+					TargetRotation = FRotator(CharacterRotation.Pitch, GetLastVelocityRotation().Yaw, CharacterRotation.Roll);
+					float InterpSpeed = CalculateRotationRate(165.f, 5.f, 375.f, 10.f);
+					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
+					break;
+				}
+				case ECharacterRotationMode::LookingDirection:
+				{
+					FRotator CharacterRotation = GetCharacterRotation();
+					float InterpSpeed = bAiming ? CalculateRotationRate(165.f, 15.f, 375.f, 15.f) : CalculateRotationRate(165.f, 10.f, 375.f, 15.f);
+					TargetRotation = FRotator(CharacterRotation.Pitch, LookingDirectionWithOffsetYaw(DeltaTime, 5.f, 60.f, -60.f, 120.f, -120.f, 5.f), CharacterRotation.Roll);
+					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
+					break;
+				}
 				}
 			}
-			break;
-
-		case EALS_MovementMode::Falling:
-
-			break;
-		}
-
-
-		if (RotationRateMultiplier < 1.f)
-		{
-			RotationRateMultiplier += DeltaTime;
-			if (RotationRateMultiplier > 1.f)
+			else if (bAiming && RotationMode == ECharacterRotationMode::LookingDirection)
 			{
-				RotationRateMultiplier = 1.f;
+				float AimYawLimit = 90.f;
+				float InterpSpeed = 15.f;
+				if (FMath::Abs(AimYawDelta) > AimYawLimit)
+				{
+					FRotator CharacterRotation = GetCharacterRotation();
+					float Yaw = AimYawDelta > 0.f ? LookingRotation.Yaw - AimYawLimit : LookingRotation.Yaw + AimYawLimit;
+					TargetRotation = FRotator(CharacterRotation.Pitch, Yaw, CharacterRotation.Roll);
+					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
+				}
 			}
+		}
+		else
+		{
+			RotationRateMultiplier = 0.f;
+			if (RootMotionRotationSpeed > 0.f && HasMovementInput())
+			{
+				FRotator CharacterRotation = GetCharacterRotation();
+				TargetRotation = FRotator(CharacterRotation.Pitch, MovementInput.Rotation().Yaw, CharacterRotation.Roll);
+				SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, RootMotionRotationSpeed));
+			}
+		}
+		break;
+
+	case EALS_MovementMode::Falling:
+
+		break;
+	}
+
+
+	if (RotationRateMultiplier < 1.f)
+	{
+		RotationRateMultiplier += DeltaTime;
+		if (RotationRateMultiplier > 1.f)
+		{
+			RotationRateMultiplier = 1.f;
 		}
 	}
 }
