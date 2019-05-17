@@ -12,4 +12,7 @@ class UXD_MovementComponentFunctionLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure, Category = "移动")
 	static FVector GetMovementInput(class ACharacter* Character);
+
+	UFUNCTION(BlueprintPure, Category = "移动")
+	static FVector GetPathFollowingInput(class ACharacter* Character);
 };

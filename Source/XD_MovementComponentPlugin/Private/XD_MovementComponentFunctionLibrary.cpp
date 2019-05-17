@@ -7,3 +7,8 @@ FVector UXD_MovementComponentFunctionLibrary::GetMovementInput(class ACharacter*
 {
 	return Character ? Character->GetCharacterMovement()->GetCurrentAcceleration() : FVector::ZeroVector;
 }
+
+FVector UXD_MovementComponentFunctionLibrary::GetPathFollowingInput(class ACharacter* Character)
+{
+	return Character ? Character->GetCharacterMovement()->RequestedVelocity : FVector::ZeroVector;
+}
