@@ -37,6 +37,7 @@ enum class EALS_MovementMode : uint8
 	None,
 	Grounded,
 	Falling,
+	Sliding,
 	Ragdoll
 };
 

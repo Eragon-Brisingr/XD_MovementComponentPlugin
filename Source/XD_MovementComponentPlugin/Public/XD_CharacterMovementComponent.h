@@ -34,9 +34,9 @@ protected:
 
 	float ChooseMaxWalkCrouchedSpeed() const;
 
-	float ChooseMaxAcceleration() const;
+	float ChooseMaxWalkAcceleration() const;
 
-	float ChooseBrakingDeceleration() const;
+	float ChooseWalkBrakingDeceleration() const;
 
 	float ChooseGroundFriction() const;
 
@@ -203,4 +203,22 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|奔跑")
 	float RunningGroundFriction = 6.f;
+	
+	//滑落
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	float SlidableFloorZ = 0.85f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	float MaxSlideSpeed = 2000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	float SlideAcceleration = 980.f;
+
+	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
+
+	void VisualizeMovement() const override;
+
+	bool IsSliding() const;
+	float GetSlideWeight() const;
+	FVector GetSlideDir() const;
 };
