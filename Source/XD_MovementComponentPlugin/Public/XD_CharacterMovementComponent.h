@@ -18,15 +18,19 @@ class XD_MOVEMENTCOMPONENTPLUGIN_API UXD_CharacterMovementComponent : public UCh
 public:
 	UXD_CharacterMovementComponent();
 
-	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
+	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
-	virtual void BeginPlay() override;
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+	void BeginPlay() override;
+
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 	void CustomMovingTick(float DeltaTime);
 
-	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 protected:
 	void UpdateMovementSetting();
 
@@ -206,8 +210,14 @@ public:
 	
 	//滑落
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
-	float SlidableFloorZ = 0.85f;
+	UPROPERTY(EditAnywhere, Category = "角色|移动|高级")
+	float SlidableFloorAngle = 35.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	float SlidableFloorZ = 0.819152f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	float SlidableFloorNormalZ = 0.573576f;
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|高级")
+	void SetSlidableFloorAngle(float Value);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
 	float MaxSlideSpeed = 2000.f;
