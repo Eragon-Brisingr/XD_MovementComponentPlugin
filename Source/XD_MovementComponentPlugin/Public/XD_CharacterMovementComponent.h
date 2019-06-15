@@ -210,25 +210,33 @@ public:
 	
 	//滑落
 public:
-	UPROPERTY(EditAnywhere, Category = "角色|移动|高级")
-	float SlidableFloorAngle = 35.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
-	float SlidableFloorZ = 0.819152f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
-	float SlidableFloorNormalZ = 0.573576f;
-	UFUNCTION(BlueprintCallable, Category = "角色|移动|高级")
+	UPROPERTY(EditAnywhere, Category = "角色|移动|滑落")
+	float SlidableFloorAngle;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|滑落")
+	float SlidableFloorZ;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|滑落")
+	float SlidableFloorNormalZ;
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	void SetSlidableFloorAngle(float Value);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|滑落")
 	float MaxSlideSpeed = 2000.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|滑落")
 	float SlideAcceleration = 980.f;
 
 	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
 
 	void VisualizeMovement() const override;
 
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	bool IsSliding() const;
-	float GetSlideWeight() const;
+	//防止向可滑落斜坡移动时的抖动
+	float CurPrepareSlidingOffsetZ;
+	//已经在进行滑动判定了，但由于还有向上的移动速度所以不会真正进入滑动状态
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
+	bool IsPrepareSliding() const;
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
+	float GetSlideSpeedWeight() const;
+	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	FVector GetSlideDir() const;
 };

@@ -21,6 +21,9 @@ UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
 	RotationRate = FRotator::ZeroRotator;
 	bCanWalkOffLedgesWhenCrouching = true;
 	CrouchedHalfHeight = 60.f;
+
+	SetWalkableFloorAngle(55.f);
+	SetSlidableFloorAngle(40.f);
 }
 
 void UXD_CharacterMovementComponent::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
@@ -53,6 +56,23 @@ void UXD_CharacterMovementComponent::BeginPlay()
 
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
+	if (IsPrepareSliding())
+	{
+		if (ALS_MovementMode != EALS_MovementMode::Sliding)
+		{
+			CurPrepareSlidingOffsetZ += Acceleration.Z * DeltaTime;
+			if (FMath::Abs(CurPrepareSlidingOffsetZ) > 300.f && (GetSlideDir() | Velocity) > 0)
+			{
+				SetALS_MovementMode(EALS_MovementMode::Sliding);
+			}
+		}
+	}
+	else
+	{
+		CurPrepareSlidingOffsetZ = 0.f;
+		SetALS_MovementMode(EALS_MovementMode::Grounded);
+	}
+
 	CustomMovingTick(DeltaTime);
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -229,7 +249,6 @@ void UXD_CharacterMovementComponent::UpdateMovementSetting()
 		break;
 	case EALS_MovementMode::Sliding:
 		BrakingDecelerationWalking = 0.f;
-		GroundFriction = 8.f;
 		break;
 	}
 }
@@ -383,7 +402,7 @@ FVector UXD_CharacterMovementComponent::GetVelocity() const
 	case EALS_MovementMode::Ragdoll:
 		return GetCharacterOwing()->GetMesh()->GetComponentVelocity();
 	}
-	return FVector::ZeroVector;
+	return Velocity;
 }
 
 bool UXD_CharacterMovementComponent::CanSprint() const
@@ -413,9 +432,9 @@ bool UXD_CharacterMovementComponent::HasMovementInput() const
 
 FRotator UXD_CharacterMovementComponent::GetLastVelocityRotation() const
 {
-	if (GetVelocity().Size() > 0.f)
+	if (!Velocity.IsZero())
 	{
-		return GetVelocity().Rotation();
+		return Velocity.Rotation();
 	}
 	else
 	{
@@ -565,7 +584,10 @@ float UXD_CharacterMovementComponent::GetMovingOnSlopeSpeedMultiplier() const
 	{
 		const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
 		float VelocityRate = FVector::DotProduct(FloorNormal, Acceleration.GetUnsafeNormal2D());
-		return 1.f + VelocityRate / SlidableFloorNormalZ;
+		float VelocityRatePowed = FMath::Pow(VelocityRate / SlidableFloorNormalZ, 3);
+		//[-1,1]映射至[-1, 0.5]，必须过(0,0)
+		float VelocityRateRes = -0.25f * VelocityRatePowed * VelocityRatePowed + 0.75 * VelocityRatePowed;
+		return 1.f + VelocityRateRes;
 	}
 	else
 	{
@@ -615,21 +637,25 @@ void UXD_CharacterMovementComponent::CalcVelocity(float DeltaTime, float Frictio
 	{
 	case MOVE_Walking:
 	case MOVE_NavWalking:
-		if (CurrentFloor.HitResult.Normal.Z < SlidableFloorZ)
+		//滑落：到达设定角度后开始滑落，滑落过程中可以控制滑落的速度和方向
+		if (IsPrepareSliding())
 		{
-			SetALS_MovementMode(EALS_MovementMode::Sliding);
-
 			const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
-			const float SlideWeight = GetSlideWeight();
-			MaxAcceleration = SlideWeight * SlideAcceleration;
-			Acceleration = Acceleration * (1.f - SlideWeight) * GetMovingOnSlopeSpeedMultiplier();
-			FVector CurSlideAcceleration = GetSlideDir() * SlideWeight * MaxAcceleration;
-			Velocity += (CurSlideAcceleration + Acceleration) * DeltaTime;
+			const FVector SlideDir = GetSlideDir();
+			const float SlideInitWeight = 0.7f;
+			const float SlideWeight = GetSlideSpeedWeight();
+
+			GroundFriction = 1.f - SlideWeight;
+			MaxAcceleration = (SlideWeight + SlideInitWeight) * SlideAcceleration;
+
+			Acceleration = Acceleration.GetSafeNormal2D() * SlideAcceleration * (SlideInitWeight - 0.2f) + GetSlideDir() * MaxAcceleration;
+			Velocity += Acceleration * DeltaTime;
+
+			ApplyVelocityBraking(DeltaTime, GroundFriction, 0.f);
 			Velocity = Velocity.GetClampedToMaxSize(MaxSlideSpeed);
 		}
 		else
 		{
-			SetALS_MovementMode(EALS_MovementMode::Grounded);
 			Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
 		}
 		break;
@@ -646,11 +672,21 @@ void UXD_CharacterMovementComponent::VisualizeMovement() const
 	if (IsSliding())
 	{
 		FVector CharacterLocation = GetOwner()->GetActorLocation();
-		::DrawDebugDirectionalArrow(GetWorld(), CharacterLocation, CharacterLocation + GetSlideDir() * SlideAcceleration * GetSlideWeight(), 5.f, FColor::Red, false, -1.f, SDPG_World, 3.f);
+		::DrawDebugDirectionalArrow(GetWorld(), CharacterLocation, CharacterLocation + GetSlideDir() * SlideAcceleration * GetSlideSpeedWeight(), 5.f, FColor::Red, false, -1.f, SDPG_World, 3.f);
 	}
 }
 
-float UXD_CharacterMovementComponent::GetSlideWeight() const
+bool UXD_CharacterMovementComponent::IsSliding() const
+{
+	return ALS_MovementMode == EALS_MovementMode::Sliding;
+}
+
+bool UXD_CharacterMovementComponent::IsPrepareSliding() const
+{
+	return CurrentFloor.HitResult.Normal.Z < SlidableFloorZ;
+}
+
+float UXD_CharacterMovementComponent::GetSlideSpeedWeight() const
 {
 	return (SlidableFloorZ - CurrentFloor.HitResult.Normal.Z) / (SlidableFloorZ - GetWalkableFloorZ());
 }
@@ -660,9 +696,3 @@ FVector UXD_CharacterMovementComponent::GetSlideDir() const
 	const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
 	return FVector(FloorNormal.X, FloorNormal.Y, -FMath::Pow(FloorNormal.Size2D(), 2) / FloorNormal.Z).GetUnsafeNormal();
 }
-
-bool UXD_CharacterMovementComponent::IsSliding() const
-{
-	return ALS_MovementMode == EALS_MovementMode::Sliding;
-}
-

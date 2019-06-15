@@ -5,10 +5,10 @@
 
 FVector UXD_MovementComponentFunctionLibrary::GetMovementInput(class ACharacter* Character)
 {
-	return Character ? Character->GetCharacterMovement()->GetCurrentAcceleration() : FVector::ZeroVector;
+	return Character ? Character->GetCharacterMovement()->GetCurrentAcceleration().GetSafeNormal() : FVector::ZeroVector;
 }
 
 FVector UXD_MovementComponentFunctionLibrary::GetPathFollowingInput(class ACharacter* Character)
 {
-	return Character ? Character->GetCharacterMovement()->RequestedVelocity : FVector::ZeroVector;
+	return Character ? Character->GetCharacterMovement()->RequestedVelocity.GetSafeNormal() : FVector::ZeroVector;
 }
