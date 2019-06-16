@@ -56,23 +56,26 @@ void UXD_CharacterMovementComponent::BeginPlay()
 
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
-	if (IsPrepareSliding())
+	if (IsMovingOnGround())
 	{
-		float CurWorldLocationZ = GetCharacterOwner()->GetActorLocation().Z;
-		if (ALS_MovementMode != EALS_MovementMode::Sliding)
+		if (IsPrepareSliding())
 		{
-			CurPrepareSlidingOffsetZ += CurWorldLocationZ - PreWorldLocationZ;
-			if (FMath::Abs(CurPrepareSlidingOffsetZ) > 50.f && (GetSlideDir() | Velocity) > 0)
+			float CurWorldLocationZ = GetCharacterOwner()->GetActorLocation().Z;
+			if (ALS_MovementMode != EALS_MovementMode::Sliding)
 			{
-				SetALS_MovementMode(EALS_MovementMode::Sliding);
+				CurPrepareSlidingOffsetZ += CurWorldLocationZ - PreWorldLocationZ;
+				if (FMath::Abs(CurPrepareSlidingOffsetZ) > 50.f && (GetSlideDir() | Velocity) > 0)
+				{
+					SetALS_MovementMode(EALS_MovementMode::Sliding);
+				}
 			}
+			PreWorldLocationZ = CurWorldLocationZ;
 		}
-		PreWorldLocationZ = CurWorldLocationZ;
-	}
-	else
-	{
-		CurPrepareSlidingOffsetZ = 0.f;
-		SetALS_MovementMode(EALS_MovementMode::Grounded);
+		else
+		{
+			CurPrepareSlidingOffsetZ = 0.f;
+			SetALS_MovementMode(EALS_MovementMode::Grounded);
+		}
 	}
 
 	CustomMovingTick(DeltaTime);
@@ -685,7 +688,7 @@ bool UXD_CharacterMovementComponent::IsSliding() const
 
 bool UXD_CharacterMovementComponent::IsPrepareSliding() const
 {
-	return CurrentFloor.HitResult.Normal.Z < SlidableFloorZ;
+	return IsMovingOnGround() && CurrentFloor.HitResult.Normal.Z < SlidableFloorZ;
 }
 
 float UXD_CharacterMovementComponent::GetSlideSpeedWeight() const
