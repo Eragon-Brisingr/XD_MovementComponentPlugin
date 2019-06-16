@@ -231,6 +231,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	bool IsSliding() const;
 	//防止向可滑落斜坡移动时的抖动
+	float PreWorldLocationZ;
 	float CurPrepareSlidingOffsetZ;
 	//已经在进行滑动判定了，但由于还有向上的移动速度所以不会真正进入滑动状态
 	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")

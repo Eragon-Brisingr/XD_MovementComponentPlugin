@@ -58,14 +58,16 @@ void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelT
 {
 	if (IsPrepareSliding())
 	{
+		float CurWorldLocationZ = GetCharacterOwner()->GetActorLocation().Z;
 		if (ALS_MovementMode != EALS_MovementMode::Sliding)
 		{
-			CurPrepareSlidingOffsetZ += Acceleration.Z * DeltaTime;
-			if (FMath::Abs(CurPrepareSlidingOffsetZ) > 300.f && (GetSlideDir() | Velocity) > 0)
+			CurPrepareSlidingOffsetZ += CurWorldLocationZ - PreWorldLocationZ;
+			if (FMath::Abs(CurPrepareSlidingOffsetZ) > 50.f && (GetSlideDir() | Velocity) > 0)
 			{
 				SetALS_MovementMode(EALS_MovementMode::Sliding);
 			}
 		}
+		PreWorldLocationZ = CurWorldLocationZ;
 	}
 	else
 	{
