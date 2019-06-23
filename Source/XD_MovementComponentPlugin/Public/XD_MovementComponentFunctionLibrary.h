@@ -5,14 +5,16 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XD_MovementComponentFunctionLibrary.generated.h"
 
+class ACharacter;
+
 UCLASS()
-class UXD_MovementComponentFunctionLibrary : public UBlueprintFunctionLibrary
+class XD_MOVEMENTCOMPONENTPLUGIN_API UXD_MovementComponentFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintPure, Category = "移动")
-	static FVector GetMovementInput(class ACharacter* Character);
+	static FVector GetMovementInput(const ACharacter* Character);
 
 	UFUNCTION(BlueprintPure, Category = "移动")
-	static FVector GetPathFollowingInput(class ACharacter* Character);
+	static FVector GetPathFollowingInput(const ACharacter* Character);
 };
