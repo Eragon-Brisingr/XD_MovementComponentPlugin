@@ -550,7 +550,7 @@ void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Valu
 
 bool UXD_CharacterMovementComponent::IsSprinting() const
 {
-	return bCanSprint && bInvokeSprint && !GetCharacterOwner()->IsPlayingRootMotion() && (MovementMode == EMovementMode::MOVE_Walking || MovementMode == EMovementMode::MOVE_NavWalking) && GetVelocity().Size() > RunningSpeed && FMath::Abs((GetVelocity().Rotation() - GetCharacterRotation()).GetNormalized().Yaw) < 10.f;
+	return bCanSprint && !GetCharacterOwner()->IsPlayingRootMotion() && IsMovingOnGround() && GetVelocity().Size() > RunningSpeed * GetMovingOnSlopeSpeedMultiplier() + 10.f;
 }
 
 FVector UXD_CharacterMovementComponent::GetMovementInput() const
