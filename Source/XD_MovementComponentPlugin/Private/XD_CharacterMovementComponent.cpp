@@ -698,6 +698,11 @@ float UXD_CharacterMovementComponent::GetSlideSpeedWeight() const
 
 FVector UXD_CharacterMovementComponent::GetSlideDir() const
 {
+	return GetFloorDir();
+}
+
+FVector UXD_CharacterMovementComponent::GetFloorDir() const
+{
 	const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
 	return FVector(FloorNormal.X, FloorNormal.Y, -FMath::Pow(FloorNormal.Size2D(), 2) / FloorNormal.Z).GetSafeNormal();
 }

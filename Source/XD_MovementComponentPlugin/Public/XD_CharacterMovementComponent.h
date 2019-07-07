@@ -240,4 +240,7 @@ public:
 	float GetSlideSpeedWeight() const;
 	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	FVector GetSlideDir() const;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|移动")
+	FVector GetFloorDir() const;
 };
