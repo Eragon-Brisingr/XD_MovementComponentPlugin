@@ -109,7 +109,7 @@ public:
 	uint8 bAutoUpdateLookingRotation : 1;
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|移动", Replicated)
-	FRotator LookingRotation;
+	FRotator ControlRotation;
 	UPROPERTY(BlueprintReadOnly, Category = "角色|移动")
 	float AimYawDelta;
 public:

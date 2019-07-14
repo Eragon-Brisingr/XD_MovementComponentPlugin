@@ -30,7 +30,7 @@ void UXD_CharacterMovementComponent::GetLifetimeReplicatedProps(TArray< class FL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, LookingRotation, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, ControlRotation, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(UXD_CharacterMovementComponent, MovementInput, COND_SkipOwner);
 }
 
@@ -89,13 +89,13 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 	{
 		if (bAutoUpdateLookingRotation)
 		{
-			LookingRotation = GetCharacterOwing()->GetControlRotation();
+			ControlRotation = GetCharacterOwing()->GetControlRotation();
 		}
 
 		FVector InputVector = UXD_MovementComponentFunctionLibrary::GetMovementInput(GetCharacterOwing());
 		MovementInput = InputVector.IsZero() ? UXD_MovementComponentFunctionLibrary::GetPathFollowingInput(GetCharacterOwing()) : InputVector;
 	}
-	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(LookingRotation, GetCharacterRotation()).Yaw;
+	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(ControlRotation, GetCharacterRotation()).Yaw;
 
 	if (HasMovementInput())
 	{
@@ -175,7 +175,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 				if (FMath::Abs(AimYawDelta) > AimYawLimit)
 				{
 					FRotator CharacterRotation = GetCharacterRotation();
-					float Yaw = AimYawDelta > 0.f ? LookingRotation.Yaw - AimYawLimit : LookingRotation.Yaw + AimYawLimit;
+					float Yaw = AimYawDelta > 0.f ? ControlRotation.Yaw - AimYawLimit : ControlRotation.Yaw + AimYawLimit;
 					TargetRotation = FRotator(CharacterRotation.Pitch, Yaw, CharacterRotation.Roll);
 					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
 				}
@@ -338,7 +338,7 @@ float UXD_CharacterMovementComponent::LookingDirectionWithOffsetYaw(float DeltaT
 		}
 	};
 
-	float Value = UKismetMathLibrary::NormalizedDeltaRotator(HasMovementInput() ? GetLastMovementInputRotation() : GetLastVelocityRotation(), LookingRotation).Yaw;
+	float Value = UKismetMathLibrary::NormalizedDeltaRotator(HasMovementInput() ? GetLastMovementInputRotation() : GetLastVelocityRotation(), ControlRotation).Yaw;
 
 	if (CardinalDirectionAngles(Value, NW, NE, Buffer, ECardinalDirection::North))
 	{
@@ -380,7 +380,7 @@ float UXD_CharacterMovementComponent::LookingDirectionWithOffsetYaw(float DeltaT
 
 	RotationOffset = FMath::FInterpTo(RotationOffset, Target, DeltaTime, OffsetInterpSpeed);
 
-	return RotationOffset + LookingRotation.Yaw;
+	return RotationOffset + ControlRotation.Yaw;
 }
 
 float UXD_CharacterMovementComponent::CalculateRotationRate(float SlowSpeed, float SlowSpeedRate, float FastSpeed, float FastSpeedRate) const
@@ -423,7 +423,7 @@ bool UXD_CharacterMovementComponent::CanSprint() const
 			case ECharacterRotationMode::VelocityDirection:
 				return true;
 			case ECharacterRotationMode::LookingDirection:
-				return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), LookingRotation).Yaw) < 50.f;
+				return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), ControlRotation).Yaw) < 50.f;
 			}
 		}
 	}
