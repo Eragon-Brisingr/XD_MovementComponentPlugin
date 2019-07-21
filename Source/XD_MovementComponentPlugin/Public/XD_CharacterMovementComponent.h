@@ -106,7 +106,7 @@ public:
 	ECharacterRotationMode RotationMode = ECharacterRotationMode::LookingDirection;
 
 	UPROPERTY(EditAnywhere, Category = "角色|移动|状态")
-	uint8 bAutoUpdateLookingRotation : 1;
+	uint8 bAutoUpdateControlRotation : 1;
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|移动", Replicated)
 	FRotator ControlRotation;

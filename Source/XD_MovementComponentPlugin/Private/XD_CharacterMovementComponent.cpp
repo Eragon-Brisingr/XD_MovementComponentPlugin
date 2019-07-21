@@ -9,7 +9,7 @@
 
 
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
-	:bAutoUpdateLookingRotation(true),
+	:bAutoUpdateControlRotation(true),
 	bCanSprint(true)
 {
 	SetIsReplicated(true);
@@ -87,7 +87,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 {
 	if (GetOwner()->HasAuthority() || GetCharacterOwner()->IsLocallyControlled())
 	{
-		if (bAutoUpdateLookingRotation)
+		if (bAutoUpdateControlRotation)
 		{
 			ControlRotation = GetCharacterOwing()->GetControlRotation();
 		}
