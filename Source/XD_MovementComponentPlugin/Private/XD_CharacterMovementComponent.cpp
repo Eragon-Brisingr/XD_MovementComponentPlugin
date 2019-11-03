@@ -653,11 +653,13 @@ void UXD_CharacterMovementComponent::CalcVelocity(float DeltaTime, float Frictio
 			GroundFriction = 1.f - SlideWeight;
 			MaxAcceleration = (SlideWeight + SlideInitWeight) * SlideAcceleration;
 
-			Acceleration = Acceleration.GetSafeNormal2D() * SlideAcceleration * (SlideInitWeight - 0.2f) + GetSlideDir() * MaxAcceleration;
+			Acceleration = Acceleration.GetSafeNormal2D() * SlideAcceleration * (SlideInitWeight - 0.2f) + SlideDir * MaxAcceleration;
 			Velocity += Acceleration * DeltaTime;
 
 			ApplyVelocityBraking(DeltaTime, GroundFriction, 0.f);
 			Velocity = Velocity.GetClampedToMaxSize(MaxSlideSpeed);
+
+			check(!Velocity.ContainsNaN());
 		}
 		else
 		{
@@ -688,7 +690,7 @@ bool UXD_CharacterMovementComponent::IsSliding() const
 
 bool UXD_CharacterMovementComponent::IsPrepareSliding() const
 {
-	return IsMovingOnGround() && CurrentFloor.HitResult.Normal.Z < SlidableFloorZ;
+	return IsMovingOnGround() && CurrentFloor.HitResult.Normal.Z > 0.f && CurrentFloor.HitResult.Normal.Z < SlidableFloorZ;
 }
 
 float UXD_CharacterMovementComponent::GetSlideSpeedWeight() const
@@ -704,5 +706,6 @@ FVector UXD_CharacterMovementComponent::GetSlideDir() const
 FVector UXD_CharacterMovementComponent::GetFloorDir() const
 {
 	const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
-	return FVector(FloorNormal.X, FloorNormal.Y, -FMath::Pow(FloorNormal.Size2D(), 2) / FloorNormal.Z).GetSafeNormal();
+	const float FloorNormalLength = FloorNormal.Size2D();
+	return FVector(FloorNormal.X, FloorNormal.Y, -(FloorNormalLength * FloorNormalLength) / FloorNormal.Z).GetSafeNormal();
 }
