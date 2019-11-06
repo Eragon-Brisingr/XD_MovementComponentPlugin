@@ -9,8 +9,7 @@
 
 
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
-	:bAutoUpdateControlRotation(true),
-	bCanSprint(true)
+	:bAutoUpdateControlRotation(true)
 {
 	SetIsReplicated(true);
 
@@ -124,21 +123,6 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 	case EALS_MovementMode::Ragdoll:
 		//TODO Do While Ragdolling
 		break;
-	}
-
-	if (GetCharacterOwing()->HasAuthority() || GetCharacterOwing()->IsLocallyControlled())
-	{
-		if (bInvokeSprint)
-		{
-			if (CanSprint())
-			{
-				SetGait(ECharacterGait::Sprinting);
-			}
-			else
-			{
-				SetGait(ECharacterGait::Running);
-			}
-		}
 	}
 
 	switch (ALS_MovementMode)
@@ -412,19 +396,16 @@ FVector UXD_CharacterMovementComponent::GetVelocity() const
 
 bool UXD_CharacterMovementComponent::CanSprint() const
 {
-	if (bCanSprint)
+	switch (ALS_MovementMode)
 	{
-		switch (ALS_MovementMode)
+	case EALS_MovementMode::Grounded:
+	case EALS_MovementMode::Falling:
+		switch (RotationMode)
 		{
-		case EALS_MovementMode::Grounded:
-		case EALS_MovementMode::Falling:
-			switch (RotationMode)
-			{
-			case ECharacterRotationMode::VelocityDirection:
-				return true;
-			case ECharacterRotationMode::LookingDirection:
-				return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), ControlRotation).Yaw) < 50.f;
-			}
+		case ECharacterRotationMode::VelocityDirection:
+			return true;
+		case ECharacterRotationMode::LookingDirection:
+			return FMath::Abs(UKismetMathLibrary::NormalizedDeltaRotator(GetLastMovementInputRotation(), ControlRotation).Yaw) < 50.f;
 		}
 	}
 	return false;
@@ -550,7 +531,7 @@ void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Valu
 
 bool UXD_CharacterMovementComponent::IsSprinting() const
 {
-	return bCanSprint && !GetCharacterOwner()->IsPlayingRootMotion() && IsMovingOnGround() && GetVelocity().Size() > RunningSpeed * GetMovingOnSlopeSpeedMultiplier() + 10.f;
+	return !GetCharacterOwner()->IsPlayingRootMotion() && IsMovingOnGround() && GetVelocity().Size() > RunningSpeed * GetMovingOnSlopeSpeedMultiplier() + 10.f;
 }
 
 FVector UXD_CharacterMovementComponent::GetMovementInput() const

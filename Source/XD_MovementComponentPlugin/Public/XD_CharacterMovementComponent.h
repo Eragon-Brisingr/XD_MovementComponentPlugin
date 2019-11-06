@@ -113,12 +113,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|移动")
 	float AimYawDelta;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|状态")
-	uint8 bInvokeSprint : 1;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|状态")
-	uint8 bCanSprint : 1;
-
 	UFUNCTION(BlueprintPure, Category = "角色|移动|状态")
 	bool IsSprinting() const;
 public:
