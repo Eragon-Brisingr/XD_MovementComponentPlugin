@@ -11,10 +11,11 @@
 UENUM(BlueprintType)
 enum class ECharacterGait : uint8
 {
-	None UMETA(Hidden),
-	Walking,
-	Running,
-	Sprinting
+	None = 0 UMETA(Hidden),
+	Walking = 1,
+	Running = 2,
+	Sprinting = 3,
+	Max = 255 UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
@@ -48,4 +49,9 @@ enum class ECardinalDirection : uint8
 	East,
 	West,
 	South
+};
+
+struct XD_MOVEMENTCOMPONENTPLUGIN_API FMovementTypeUtils
+{
+	static FText GetGaitName(ECharacterGait Gait);
 };
