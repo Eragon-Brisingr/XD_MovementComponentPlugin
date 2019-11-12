@@ -159,8 +159,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "角色|移动|高级")
 	float GroundMoveSpeedMultiplier = 1.f;
 
-	float AnimNotifyControlGroundMoveSpeedMultiplier = 1.f;
-
 	UFUNCTION(BlueprintCallable, Category = "角色|移动|高级")
 	float GetMovingOnSlopeSpeedMultiplier() const;
 

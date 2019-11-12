@@ -593,7 +593,7 @@ float UXD_CharacterMovementComponent::GetMaxSpeed() const
 		}
 		else
 		{
-			return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * AnimNotifyControlGroundMoveSpeedMultiplier * GetMovingOnSlopeSpeedMultiplier();
+			return Super::GetMaxSpeed() * GroundMoveSpeedMultiplier * GetMovingOnSlopeSpeedMultiplier();
 		}
 	}
 	return Super::GetMaxSpeed();
