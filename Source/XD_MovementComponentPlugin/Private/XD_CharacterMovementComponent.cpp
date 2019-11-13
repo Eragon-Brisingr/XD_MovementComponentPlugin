@@ -605,7 +605,7 @@ FVector UXD_CharacterMovementComponent::CalcAnimRootMotionVelocity(const FVector
 	{
 	case MOVE_Walking:
 	case MOVE_NavWalking:
-		return Super::CalcAnimRootMotionVelocity(RootMotionDeltaMove, DeltaSeconds, CurrentVelocity) * GetMovingOnSlopeSpeedMultiplier();
+		return Super::CalcAnimRootMotionVelocity(RootMotionDeltaMove, DeltaSeconds, CurrentVelocity) * GetMovingOnSlopeSpeedMultiplier() * GroundMoveSpeedMultiplier;
 	}
 	return Super::CalcAnimRootMotionVelocity(RootMotionDeltaMove, DeltaSeconds, CurrentVelocity);
 }
