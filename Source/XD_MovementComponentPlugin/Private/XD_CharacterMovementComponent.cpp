@@ -38,7 +38,7 @@ void UXD_CharacterMovementComponent::PostEditChangeProperty(FPropertyChangedEven
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	const FName PropertyName = PropertyChangedEvent.MemberProperty->GetFName();
+	const FName PropertyName = PropertyChangedEvent.MemberProperty ? PropertyChangedEvent.MemberProperty->GetFName() : NAME_None;
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(UXD_CharacterMovementComponent, SlidableFloorAngle))
 	{
 		SetSlidableFloorAngle(SlidableFloorAngle);
