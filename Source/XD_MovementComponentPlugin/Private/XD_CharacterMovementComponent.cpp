@@ -53,31 +53,37 @@ void UXD_CharacterMovementComponent::BeginPlay()
 	SetGait(ECharacterGait::Walking);
 }
 
+DECLARE_CYCLE_STAT(TEXT("XD Character Movement Tick"), STAT_XD_CharacterMovementTick, STATGROUP_Game);
+
 void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
-	if (IsMovingOnGround())
 	{
-		if (IsPrepareSliding())
-		{
-			float CurWorldLocationZ = GetCharacterOwner()->GetActorLocation().Z;
-			if (ALS_MovementMode != EALS_MovementMode::Sliding)
-			{
-				CurPrepareSlidingOffsetZ += CurWorldLocationZ - PreWorldLocationZ;
-				if (FMath::Abs(CurPrepareSlidingOffsetZ) > 50.f && (GetSlideDir() | Velocity) > 0)
-				{
-					SetALS_MovementMode(EALS_MovementMode::Sliding);
-				}
-			}
-			PreWorldLocationZ = CurWorldLocationZ;
-		}
-		else
-		{
-			CurPrepareSlidingOffsetZ = 0.f;
-			SetALS_MovementMode(EALS_MovementMode::Grounded);
-		}
-	}
+		SCOPE_CYCLE_COUNTER(STAT_XD_CharacterMovementTick);
 
-	CustomMovingTick(DeltaTime);
+		if (IsMovingOnGround())
+		{
+			if (IsPrepareSliding())
+			{
+				float CurWorldLocationZ = GetCharacterOwner()->GetActorLocation().Z;
+				if (ALS_MovementMode != EALS_MovementMode::Sliding)
+				{
+					CurPrepareSlidingOffsetZ += CurWorldLocationZ - PreWorldLocationZ;
+					if (FMath::Abs(CurPrepareSlidingOffsetZ) > 50.f && (GetSlideDir() | Velocity) > 0)
+					{
+						SetALS_MovementMode(EALS_MovementMode::Sliding);
+					}
+				}
+				PreWorldLocationZ = CurWorldLocationZ;
+			}
+			else
+			{
+				CurPrepareSlidingOffsetZ = 0.f;
+				SetALS_MovementMode(EALS_MovementMode::Grounded);
+			}
+		}
+
+		CustomMovingTick(DeltaTime);
+	}
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
@@ -617,6 +623,7 @@ void UXD_CharacterMovementComponent::SetSlidableFloorAngle(float Value)
 	SlidableFloorNormalZ = FMath::Cos(FMath::DegreesToRadians(90.f - SlidableFloorAngle));
 }
 
+DECLARE_CYCLE_STAT(TEXT("XD Character Movement Sliding"), STAT_XD_CharacterMovementSliding, STATGROUP_Game);
 void UXD_CharacterMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
 {
 	switch (MovementMode)
@@ -626,6 +633,8 @@ void UXD_CharacterMovementComponent::CalcVelocity(float DeltaTime, float Frictio
 		//滑落：到达设定角度后开始滑落，滑落过程中可以控制滑落的速度和方向
 		if (IsPrepareSliding())
 		{
+			SCOPE_CYCLE_COUNTER(STAT_XD_CharacterMovementSliding);
+
 			const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
 			const FVector SlideDir = GetSlideDir();
 			const float SlideInitWeight = 0.7f;
