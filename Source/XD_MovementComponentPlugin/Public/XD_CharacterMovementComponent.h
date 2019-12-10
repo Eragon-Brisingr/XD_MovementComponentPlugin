@@ -218,7 +218,7 @@ public:
 
 	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
 
-	void VisualizeMovement() const override;
+	float VisualizeMovement() const override;
 
 	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	bool IsSliding() const;

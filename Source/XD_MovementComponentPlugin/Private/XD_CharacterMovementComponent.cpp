@@ -11,7 +11,7 @@
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
 	:bAutoUpdateControlRotation(true)
 {
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 
 	MovementState.bCanCrouch = true;
 	MovementState.bCanSwim = true;
@@ -662,15 +662,16 @@ void UXD_CharacterMovementComponent::CalcVelocity(float DeltaTime, float Frictio
 	}
 }
 
-void UXD_CharacterMovementComponent::VisualizeMovement() const
+float UXD_CharacterMovementComponent::VisualizeMovement() const
 {
-	Super::VisualizeMovement();
+	float HeightOffset = Super::VisualizeMovement();
 
 	if (IsSliding())
 	{
 		FVector CharacterLocation = GetOwner()->GetActorLocation();
 		::DrawDebugDirectionalArrow(GetWorld(), CharacterLocation, CharacterLocation + GetSlideDir() * SlideAcceleration * GetSlideSpeedWeight(), 5.f, FColor::Red, false, -1.f, SDPG_World, 3.f);
 	}
+	return HeightOffset;
 }
 
 bool UXD_CharacterMovementComponent::IsSliding() const
