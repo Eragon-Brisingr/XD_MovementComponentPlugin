@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include <GameFramework/Character.h>
 #include "XD_MovementComponent_Character.generated.h"
 
 UCLASS()

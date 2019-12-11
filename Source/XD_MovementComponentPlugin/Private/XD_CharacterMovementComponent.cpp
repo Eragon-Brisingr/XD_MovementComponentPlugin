@@ -4,8 +4,8 @@
 #include "XD_MovementComponentFunctionLibrary.h"
 #include <GameFramework/Character.h>
 #include <Kismet/KismetMathLibrary.h>
-#include <UnrealNetwork.h>
-#include "DrawDebugHelpers.h"
+#include <Net/UnrealNetwork.h>
+#include <DrawDebugHelpers.h>
 
 
 UXD_CharacterMovementComponent::UXD_CharacterMovementComponent()
