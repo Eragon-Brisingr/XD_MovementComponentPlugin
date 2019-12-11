@@ -142,13 +142,13 @@ public:
 
 	//CharacterRotation
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "角色|移动|转身")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|转身")
 	ECardinalDirection CardinalDirection;
 
-	UPROPERTY(BlueprintReadWrite, Category = "角色|移动|转身")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|转身")
 	FRotator TargetRotation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|转身")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|转身")
 	float RotationOffset;
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|移动|转身")
@@ -204,9 +204,9 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "角色|移动|滑落")
 	float SlidableFloorAngle;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|滑落")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|移动|滑落")
 	float SlidableFloorZ;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "角色|移动|滑落")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|移动|滑落")
 	float SlidableFloorNormalZ;
 	UFUNCTION(BlueprintCallable, Category = "角色|移动|滑落")
 	void SetSlidableFloorAngle(float Value);

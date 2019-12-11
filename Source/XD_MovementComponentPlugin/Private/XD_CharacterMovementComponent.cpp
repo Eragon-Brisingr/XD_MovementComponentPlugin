@@ -142,16 +142,16 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 				{
 				case ECharacterRotationMode::VelocityDirection:
 				{
-					FRotator CharacterRotation = GetCharacterRotation();
+					const FRotator CharacterRotation = GetCharacterRotation();
+					const float InterpSpeed = CalculateRotationRate(165.f, 5.f, 375.f, 10.f);
 					TargetRotation = FRotator(CharacterRotation.Pitch, GetLastVelocityRotation().Yaw, CharacterRotation.Roll);
-					float InterpSpeed = CalculateRotationRate(165.f, 5.f, 375.f, 10.f);
 					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
 					break;
 				}
 				case ECharacterRotationMode::LookingDirection:
 				{
-					FRotator CharacterRotation = GetCharacterRotation();
-					float InterpSpeed = bAiming ? CalculateRotationRate(165.f, 15.f, 375.f, 15.f) : CalculateRotationRate(165.f, 10.f, 375.f, 15.f);
+					const FRotator CharacterRotation = GetCharacterRotation();
+					const float InterpSpeed = bAiming ? CalculateRotationRate(165.f, 15.f, 375.f, 15.f) : CalculateRotationRate(165.f, 10.f, 375.f, 15.f);
 					TargetRotation = FRotator(CharacterRotation.Pitch, LookingDirectionWithOffsetYaw(DeltaTime, 5.f, 60.f, -60.f, 120.f, -120.f, 5.f), CharacterRotation.Roll);
 					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
 					break;
@@ -164,8 +164,8 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 				float InterpSpeed = 15.f;
 				if (FMath::Abs(AimYawDelta) > AimYawLimit)
 				{
-					FRotator CharacterRotation = GetCharacterRotation();
-					float Yaw = AimYawDelta > 0.f ? ControlRotation.Yaw - AimYawLimit : ControlRotation.Yaw + AimYawLimit;
+					const FRotator CharacterRotation = GetCharacterRotation();
+					const float Yaw = AimYawDelta > 0.f ? ControlRotation.Yaw - AimYawLimit : ControlRotation.Yaw + AimYawLimit;
 					TargetRotation = FRotator(CharacterRotation.Pitch, Yaw, CharacterRotation.Roll);
 					SetCharacterRotation(FMath::RInterpTo(CharacterRotation, TargetRotation, DeltaTime, InterpSpeed));
 				}
@@ -375,7 +375,7 @@ float UXD_CharacterMovementComponent::LookingDirectionWithOffsetYaw(float DeltaT
 
 float UXD_CharacterMovementComponent::CalculateRotationRate(float SlowSpeed, float SlowSpeedRate, float FastSpeed, float FastSpeedRate) const
 {
-	float HorizontalSpeed = GetVelocity().Size2D();
+	const float HorizontalSpeed = GetVelocity().Size2D();
 	if (HorizontalSpeed > SlowSpeed)
 	{
 		return FMath::Clamp(UKismetMathLibrary::MapRangeUnclamped(HorizontalSpeed, SlowSpeed, FastSpeed, SlowSpeedRate, FastSpeedRate) * RotationRateMultiplier, 0.1f, 15.f);
