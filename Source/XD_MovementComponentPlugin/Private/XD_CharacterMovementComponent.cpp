@@ -388,13 +388,8 @@ float UXD_CharacterMovementComponent::CalculateRotationRate(float SlowSpeed, flo
 
 FVector UXD_CharacterMovementComponent::GetVelocity() const
 {
-	switch (ALS_MovementMode)
+	if (ALS_MovementMode == EALS_MovementMode::Ragdoll)
 	{
-	case EALS_MovementMode::None:
-	case EALS_MovementMode::Grounded:
-	case EALS_MovementMode::Falling:
-		return GetCharacterOwing()->GetVelocity();
-	case EALS_MovementMode::Ragdoll:
 		return GetCharacterOwing()->GetMesh()->GetComponentVelocity();
 	}
 	return Velocity;
