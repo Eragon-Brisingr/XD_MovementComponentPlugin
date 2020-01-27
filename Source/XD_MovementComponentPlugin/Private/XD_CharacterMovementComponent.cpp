@@ -505,13 +505,19 @@ void UXD_CharacterMovementComponent::SetStanceState(ECharacterStanceState Value)
 void UXD_CharacterMovementComponent::Crouch(bool bClientSimulation)
 {
 	Super::Crouch(bClientSimulation);
-	SetStanceState(ECharacterStanceState::Crouching);
+	if (IsCrouching())
+	{
+		SetStanceState(ECharacterStanceState::Crouching);
+	}
 }
 
 void UXD_CharacterMovementComponent::UnCrouch(bool bClientSimulation)
 {
 	Super::UnCrouch(bClientSimulation);
-	SetStanceState(ECharacterStanceState::Standing);
+	if (!IsCrouching())
+	{
+		SetStanceState(ECharacterStanceState::Standing);
+	}
 }
 
 void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Value)
