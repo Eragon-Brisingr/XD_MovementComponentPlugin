@@ -1,7 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "XD_CharacterMovementComponent.h"
-#include "XD_MovementComponentFunctionLibrary.h"
 #include <GameFramework/Character.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Net/UnrealNetwork.h>
@@ -90,15 +89,24 @@ void UXD_CharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelT
 
 void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 {
+	ACharacter* OwingCharacter = GetCharacterOwing();
 	if (GetOwner()->HasAuthority() || GetCharacterOwner()->IsLocallyControlled())
 	{
 		if (bAutoUpdateControlRotation)
 		{
-			ControlRotation = GetCharacterOwing()->GetControlRotation();
+			ControlRotation = OwingCharacter->GetControlRotation();
 		}
 
-		FVector InputVector = UXD_MovementComponentFunctionLibrary::GetMovementInput(GetCharacterOwing());
-		MovementInput = InputVector.IsZero() ? UXD_MovementComponentFunctionLibrary::GetPathFollowingInput(GetCharacterOwing()) : InputVector;
+		const FVector InputVector = GetCurrentAcceleration().GetSafeNormal();
+		if (InputVector.IsZero())
+		{
+			// 速度的3倍缩放比较合理的值，类似于目标点在玩家3m内认为输入很小
+			MovementInput = RequestedVelocity * DeltaTime / (GetMaxSpeed() * 3.f);
+		}
+		else
+		{
+			MovementInput = InputVector;
+		}
 	}
 	AimYawDelta = UKismetMathLibrary::NormalizedDeltaRotator(ControlRotation, GetCharacterRotation()).Yaw;
 
@@ -134,7 +142,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 	switch (ALS_MovementMode)
 	{
 	case EALS_MovementMode::Grounded:
-		if (!GetCharacterOwing()->IsPlayingRootMotion())
+		if (!OwingCharacter->IsPlayingRootMotion())
 		{
 			if (IsMoving())
 			{
@@ -183,7 +191,7 @@ void UXD_CharacterMovementComponent::CustomMovingTick(float DeltaTime)
 		}
 		break;
 	case EALS_MovementMode::Sliding:
-		if (!GetCharacterOwing()->IsPlayingRootMotion())
+		if (!OwingCharacter->IsPlayingRootMotion())
 		{
 			FRotator CharacterRotation = GetCharacterRotation();
 			TargetRotation = FRotator(CharacterRotation.Pitch, GetLastVelocityRotation().Yaw, CharacterRotation.Roll);
@@ -414,7 +422,7 @@ bool UXD_CharacterMovementComponent::CanSprint() const
 
 bool UXD_CharacterMovementComponent::HasMovementInput() const
 {
-	return !GetMovementInput().Equals(FVector::ZeroVector, 0.0001f);
+	return GetMovementInput().SizeSquared() > 0.1f;
 }
 
 FRotator UXD_CharacterMovementComponent::GetLastVelocityRotation() const
