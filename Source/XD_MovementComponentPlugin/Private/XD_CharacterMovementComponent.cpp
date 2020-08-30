@@ -546,7 +546,11 @@ void UXD_CharacterMovementComponent::SetRotationMode(ECharacterRotationMode Valu
 
 bool UXD_CharacterMovementComponent::IsSprinting() const
 {
-	return !GetCharacterOwner()->IsPlayingRootMotion() && IsMovingOnGround() && GetVelocity().Size() > RunningSpeed * GroundMoveSpeedMultiplier * GetMovingOnSlopeSpeedMultiplier() + 10.f;
+	if (CharacterOwner)
+	{
+		return !CharacterOwner->IsPlayingRootMotion() && IsMovingOnGround() && GetVelocity().Size() > RunningSpeed* GroundMoveSpeedMultiplier* GetMovingOnSlopeSpeedMultiplier() + 10.f;
+	}
+	return false;
 }
 
 FVector UXD_CharacterMovementComponent::GetMovementInput() const
